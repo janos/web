@@ -30,7 +30,7 @@ func TestHandleMethods_KnownMethod(t *testing.T) {
 	}
 	v := w.Body.String()
 	if v != body {
-		t.Errorf("expected body \"%s\", got \"%s\"", body, v)
+		t.Errorf("expected body %q, got %q", body, v)
 	}
 }
 
@@ -52,11 +52,11 @@ func TestHandleMethods_UnknownMethod(t *testing.T) {
 	}
 	v := w.Body.String()
 	if v != body+"\n" {
-		t.Errorf("expected body \"%s\", got \"%s\"", body+"\n", v)
+		t.Errorf("expected body %q, got %q", body+"\n", v)
 	}
 	v = w.Header().Get("Allow")
 	if v != allow {
-		t.Errorf("expected Allow header \"%s\", got \"%s\"", allow, v)
+		t.Errorf("expected Allow header %q, got %q", allow, v)
 	}
 }
 
@@ -78,6 +78,6 @@ func TestHandleMethods_Options(t *testing.T) {
 	}
 	v := w.Header().Get("Allow")
 	if v != allow {
-		t.Errorf("expected Allow header \"%s\", got \"%s\"", allow, v)
+		t.Errorf("expected Allow header %q, got %q", allow, v)
 	}
 }

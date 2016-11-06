@@ -40,7 +40,7 @@ func TestNewStaticFilesHandler(t *testing.T) {
 
 	body := w.Body.String()
 	if body != content {
-		t.Errorf("expected content \"%s\", got \"%s\"", content, body)
+		t.Errorf("expected content %q, got %q", content, body)
 	}
 }
 
