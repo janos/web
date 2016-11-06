@@ -25,6 +25,8 @@ const basicAuthScheme string = "Basic "
 //  - single API key auth handler with Basic auth support - BasicAuthRealm and KeyHeaderName are set
 //  - public/secret API key auth handler - KeyHeaderName and SecretHeaderName are set
 //  - public/secret API key auth handler with Basic auth support - all three are set
+// By setting AuthorizedNetworks, this handler can authorize requests based only on
+// RemoteAddr address.
 type AuthHandler struct {
 	KeyHeaderName    string
 	SecretHeaderName string
