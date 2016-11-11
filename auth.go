@@ -75,7 +75,9 @@ func (h AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.Handler.ServeHTTP(w, r)
+	if h.Handler != nil {
+		h.Handler.ServeHTTP(w, r)
+	}
 }
 
 func (h AuthHandler) authenticate(r *http.Request) (key, secret string, valid bool, err error) {
@@ -119,7 +121,6 @@ func (h AuthHandler) authenticate(r *http.Request) (key, secret string, valid bo
 			if !strings.HasPrefix(auth, basicAuthScheme) {
 				return
 			}
-
 			var decoded []byte
 			decoded, err = base64.StdEncoding.DecodeString(auth[len(basicAuthScheme):])
 			if err != nil {
