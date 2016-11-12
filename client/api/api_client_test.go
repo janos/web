@@ -649,7 +649,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("Error400", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "bad request"
+		want := "http status: bad request"
 		code := 400
 		_, err := client.Request("GET", "/bad-request", nil, nil, nil)
 		errLocal, ok := err.(*Error)
@@ -691,7 +691,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("Error500", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "internal server error"
+		want := "http status: internal server error"
 		code := 500
 		_, err := client.Request("GET", "/internal-server-error", nil, nil, nil)
 		errLocal, ok := err.(*Error)
@@ -775,7 +775,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("ErrorWithInvalidMessageResponseType", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "not found"
+		want := "http status: not found"
 		code := 404
 		_, err := client.Request("GET", "/error-invalid-message-type", nil, nil, nil)
 		errLocal, ok := err.(*Error)

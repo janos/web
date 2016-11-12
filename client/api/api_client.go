@@ -128,7 +128,7 @@ func (c Client) Request(method, path string, query url.Values, body io.Reader, a
 		if message.Message != "" {
 			status = message.Message
 		} else {
-			status = strings.ToLower(http.StatusText(resp.StatusCode))
+			status = "http status: " + strings.ToLower(http.StatusText(resp.StatusCode))
 		}
 		err = &Error{
 			Status: status,
