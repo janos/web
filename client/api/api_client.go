@@ -120,14 +120,14 @@ func (c Client) Request(method, path string, query url.Values, body io.Reader, a
 				return
 			}
 		}
+		var status string
 		if message.Message != nil {
-			err = &Error{
-				message: *message.Message,
-			}
-			return
+			status = *message.Message
+		} else {
+			status = http.StatusText(resp.StatusCode)
 		}
-		err = &HTTPError{
-			Status: resp.Status,
+		err = &Error{
+			Status: status,
 			Code:   resp.StatusCode,
 		}
 	}
