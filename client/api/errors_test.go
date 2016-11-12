@@ -9,7 +9,7 @@ import "testing"
 
 func TestError(t *testing.T) {
 	want := "http test error"
-	got := (&Error{Status: want, Code: 1000}).Error()
+	got := (&Error{Message: want, Code: 1000}).Error()
 	if want != got {
 		t.Errorf("expected %q, got %q", want, got)
 	}
