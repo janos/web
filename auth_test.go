@@ -76,7 +76,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "KeyAuthorized",
 			handler: AuthHandler{
 				KeyHeaderName: "X-Key",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -96,7 +96,7 @@ func TestAuthHandler(t *testing.T) {
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("Passed"))
 				}),
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -114,7 +114,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				KeyHeaderName:    "X-Key",
 				SecretHeaderName: "X-Secret",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" && secret == "secret"
 					return
 				},
@@ -133,7 +133,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				KeyHeaderName:    "X-Key",
 				SecretHeaderName: "X-Secret",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" && secret == "secret"
 					return
 				},
@@ -151,7 +151,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				KeyHeaderName:    "X-Key",
 				SecretHeaderName: "X-Secret",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" && secret == "secret"
 					return
 				},
@@ -172,7 +172,7 @@ func TestAuthHandler(t *testing.T) {
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("Passed"))
 				}),
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -192,7 +192,7 @@ func TestAuthHandler(t *testing.T) {
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("Passed"))
 				}),
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -209,7 +209,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "BasicAuthUnauthorized",
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -226,7 +226,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "BasicAuthUnauthorized2",
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
 					return
 				},
@@ -242,7 +242,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "BasicAuthSplitCredentialsUnauthorized",
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					return
 				},
 			},
@@ -288,7 +288,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "PostAuth",
 			handler: AuthHandler{
 				AuthorizeAll: true,
-				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, key, secret string, valid bool) (rr *http.Request, err error) {
+				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error) {
 					w.WriteHeader(http.StatusTeapot)
 					w.Write([]byte("Post auth"))
 					return
@@ -302,12 +302,13 @@ func TestAuthHandler(t *testing.T) {
 			name: "PostAuthWithContenxt",
 			handler: AuthHandler{
 				KeyHeaderName: "X-Key",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0"
+					entity = key
 					return
 				},
-				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, key, secret string, valid bool) (rr *http.Request, err error) {
-					rr = r.WithContext(context.WithValue(r.Context(), "key", key))
+				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error) {
+					rr = r.WithContext(context.WithValue(r.Context(), "key", entity))
 					return
 				},
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -330,7 +331,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "AuthFuncError",
 			handler: AuthHandler{
 				KeyHeaderName: "X-Key",
-				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, key, secret string, valid bool) (rr *http.Request, err error) {
+				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error) {
 					err = errors.New("test error")
 					return
 				},
@@ -351,7 +352,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "PostAuthFuncError",
 			handler: AuthHandler{
 				KeyHeaderName: "X-Key",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					err = errors.New("test error")
 					return
 				},
@@ -391,7 +392,7 @@ func TestAuthHandler(t *testing.T) {
 			name: "BasicAuthBase64Error",
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
-				AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					return
 				},
 				ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
@@ -441,7 +442,7 @@ func TestAuthHandler(t *testing.T) {
 
 		handler := AuthHandler{
 			KeyHeaderName: "X-Key",
-			AuthFunc: func(r *http.Request, key, secret string) (valid bool, err error) {
+			AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 				err = errTest
 				return
 			},
