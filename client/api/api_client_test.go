@@ -183,7 +183,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Headers["User-Agent"][0] != client.UserAgent {
-			t.Errorf("expeced user agent %q, got %q", client.UserAgent, want.Headers["User-Agent"][0])
+			t.Errorf("expected user agent %q, got %q", client.UserAgent, want.Headers["User-Agent"][0])
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Testing 1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -225,10 +225,10 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Headers["One"][0] != "1" {
-			t.Errorf("expeced header One %q, got %q", "1", want.Headers["One"][0])
+			t.Errorf("expected header One %q, got %q", "1", want.Headers["One"][0])
 		}
 		if want.Headers["Two"][0] != "2" {
-			t.Errorf("expeced header Two %q, got %q", "2", want.Headers["Two"][0])
+			t.Errorf("expected header Two %q, got %q", "2", want.Headers["Two"][0])
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"One":["1"],"Two":["2"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -300,7 +300,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Headers[DefaultKeyHeader][0] != client.Key {
-			t.Errorf("expeced header %q %q, got %q", DefaultKeyHeader, client.Key, want.Headers[DefaultKeyHeader][0])
+			t.Errorf("expected header %q %q, got %q", DefaultKeyHeader, client.Key, want.Headers[DefaultKeyHeader][0])
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"],"X-Key":["KeyValue"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -341,7 +341,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Headers[client.KeyHeader][0] != client.Key {
-			t.Errorf("expeced header %q %q, got %q", client.KeyHeader, client.Key, want.Headers[client.KeyHeader][0])
+			t.Errorf("expected header %q %q, got %q", client.KeyHeader, client.Key, want.Headers[client.KeyHeader][0])
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"],"X-Custom-Key":["KeyCustomValue"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -382,7 +382,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Headers[DefaultKeyHeader][0] != client.Key {
-			t.Errorf("expeced header %q %q, got %q", DefaultKeyHeader, client.Key, want.Headers[DefaultKeyHeader][0])
+			t.Errorf("expected header %q %q, got %q", DefaultKeyHeader, client.Key, want.Headers[DefaultKeyHeader][0])
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"],"X-Key":["KeyValue"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -422,7 +422,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.URL.Path != path {
-			t.Errorf("expeced url path %q, got %q", path, want.URL.Path)
+			t.Errorf("expected url path %q, got %q", path, want.URL.Path)
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -462,7 +462,7 @@ func TestClient(t *testing.T) {
 		}
 		path := "/subpath/test-path"
 		if want.URL.Path != path {
-			t.Errorf("expeced url path %q, got %q", path, want.URL.Path)
+			t.Errorf("expected url path %q, got %q", path, want.URL.Path)
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/subpath/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -502,7 +502,7 @@ func TestClient(t *testing.T) {
 		}
 		path := "/test-path"
 		if want.URL.Path != path {
-			t.Errorf("expeced url path %q, got %q", path, want.URL.Path)
+			t.Errorf("expected url path %q, got %q", path, want.URL.Path)
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -543,7 +543,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.URL.Query().Get("limit") != "100" {
-			t.Errorf("expeced url path %q, got %q", "100", want.URL.Query().Get("limit"))
+			t.Errorf("expected url path %q, got %q", "100", want.URL.Query().Get("limit"))
 		}
 		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
@@ -583,7 +583,7 @@ func TestClient(t *testing.T) {
 			t.Error(err.Error())
 		}
 		if want.Body != body {
-			t.Errorf("expeced url path %q, got %q", body, want.Body)
+			t.Errorf("expected url path %q, got %q", body, want.Body)
 		}
 		body = `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
 		r, err := client.Request("GET", "/", nil, nil, nil)
