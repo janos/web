@@ -52,6 +52,13 @@ type Options struct {
 
 // New creates a net/http.Client with options from Options.
 func New(options *Options) *http.Client {
+	return &http.Client{
+		Transport: Transport(options),
+	}
+}
+
+// Transport creates a net/http.Transport with options from Options.
+func Transport(options *Options) *http.Transport {
 	if options.Timeout == 0 {
 		options.Timeout = 30 * time.Second
 	}
@@ -110,9 +117,7 @@ func New(options *Options) *http.Client {
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: options.TLSSkipVerify},
 	}
 	http2.ConfigureTransport(transport)
-	return &http.Client{
-		Transport: transport,
-	}
+	return transport
 }
 
 // optionsJSON is a helper structure to marshal

@@ -59,6 +59,14 @@ func TestClientRetry(t *testing.T) {
 	if r == nil {
 		t.Error("unexpected nil response")
 	}
+
+	r, err = (&http.Client{Transport: Transport(&Options{RetryTimeMax: 10 * time.Second})}).Get(fmt.Sprintf("http://localhost:%d", port))
+	if err != nil {
+		t.Error(err)
+	}
+	if r == nil {
+		t.Error("unexpected nil response")
+	}
 }
 
 func TestClientRetryFailure(t *testing.T) {
@@ -86,6 +94,14 @@ func TestClientRetryFailure(t *testing.T) {
 	}()
 
 	r, err := New(&Options{RetryTimeMax: 1 * time.Second}).Get(fmt.Sprintf("http://localhost:%d", port))
+	if err == nil || !strings.Contains(err.Error(), "getsockopt: connection refused") {
+		t.Errorf("expected connection refused error, got %#v", err)
+	}
+	if r != nil {
+		t.Error("unexpected not-nil response")
+	}
+
+	r, err = (&http.Client{Transport: Transport(&Options{RetryTimeMax: 1 * time.Second})}).Get(fmt.Sprintf("http://localhost:%d", port))
 	if err == nil || !strings.Contains(err.Error(), "getsockopt: connection refused") {
 		t.Errorf("expected connection refused error, got %#v", err)
 	}
