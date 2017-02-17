@@ -8,7 +8,6 @@ package httpClient // import "resenje.org/httputils/client/http"
 import (
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"math/rand"
 	"net"
 	"net/http"
@@ -113,20 +112,6 @@ func New(options *Options) *http.Client {
 	http2.ConfigureTransport(transport)
 	return &http.Client{
 		Transport: transport,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) >= 10 {
-				return errors.New("stopped after 10 redirects")
-			}
-			if len(via) == 0 {
-				return nil
-			}
-			for attr, val := range via[0].Header {
-				if _, ok := req.Header[attr]; !ok {
-					req.Header[attr] = val
-				}
-			}
-			return nil
-		},
 	}
 }
 
