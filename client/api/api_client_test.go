@@ -373,6 +373,50 @@ func TestClient(t *testing.T) {
 		}
 	})
 
+	t.Run("BasicAuth", func(t *testing.T) {
+		client := New(ts.URL, nil)
+		client.BasicAuth = &BasicAuth{
+			Username: "test-username",
+			Password: "test-password",
+		}
+		want := &TestResponseJSON{}
+		if err := client.JSON("GET", "/", nil, nil, want); err != nil {
+			t.Error(err.Error())
+		}
+		wantHeader := "Basic dGVzdC11c2VybmFtZTp0ZXN0LXBhc3N3b3Jk"
+		if want.Headers["Authorization"][0] != wantHeader {
+			t.Errorf("expected Authorization header %q, got %q", wantHeader, want.Headers["Authorization"][0])
+		}
+		body := `{"Method":"GET","URL":{"Scheme":"","Opaque":"","User":null,"Host":"","Path":"/","RawPath":"","ForceQuery":false,"RawQuery":"","Fragment":""},"Headers":{"Accept-Encoding":["gzip"],"Authorization":["Basic dGVzdC11c2VybmFtZTp0ZXN0LXBhc3N3b3Jk"],"User-Agent":["Go-http-client/1.1"]},"Body":""}`
+		r, err := client.Request("GET", "/", nil, nil, nil)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		r.Body.Close()
+		if string(b) != body {
+			t.Errorf("expected body %q, got %q", body, string(b))
+		}
+		data, ct, err := client.Stream("GET", "/", nil, nil, nil)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		b, err = ioutil.ReadAll(data)
+		if err != nil {
+			t.Error(err.Error())
+		}
+		data.Close()
+		if string(b) != body {
+			t.Errorf("expected body %q, got %q", body, string(b))
+		}
+		if ct != contentType {
+			t.Errorf("expected Content-Type header %q, got %q", contentType, ct)
+		}
+	})
+
 	t.Run("KeyEmptyHeader", func(t *testing.T) {
 		client := New(ts.URL, nil)
 		client.Key = "KeyValue"
