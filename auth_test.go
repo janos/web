@@ -28,6 +28,12 @@ func TestAuthHandler(t *testing.T) {
 	}
 	validNetwork := *cidr
 
+	_, cidr, err = net.ParseCIDR("172.16.0.0/12")
+	if err != nil {
+		t.Fatal(err)
+	}
+	trustedProxyNetwork := *cidr
+
 	for _, tc := range []struct {
 		name       string
 		handler    AuthHandler
@@ -297,6 +303,82 @@ func TestAuthHandler(t *testing.T) {
 			request:    httptest.NewRequest("", "/", nil),
 			statusCode: http.StatusTeapot,
 			body:       "Post auth",
+		},
+		{
+			name: "AuthorizedNetworksFromXRealIP",
+			handler: AuthHandler{
+				AuthorizedNetworks: []net.IPNet{
+					validNetwork,
+				},
+				TrustedProxyNetworks: []net.IPNet{
+					trustedProxyNetwork,
+				},
+			},
+			request: func() *http.Request {
+				r := httptest.NewRequest("", "/", nil)
+				r.Header.Set("X-Real-Ip", "1.2.3.4")
+				r.RemoteAddr = "172.16.1.1:61234"
+				return r
+			}(),
+			statusCode: http.StatusOK,
+			body:       "",
+		},
+		{
+			name: "AuthorizedNetworksFromXRealIPUnauthorized",
+			handler: AuthHandler{
+				AuthorizedNetworks: []net.IPNet{
+					validNetwork,
+				},
+				TrustedProxyNetworks: []net.IPNet{
+					trustedProxyNetwork,
+				},
+			},
+			request: func() *http.Request {
+				r := httptest.NewRequest("", "/", nil)
+				r.Header.Set("X-Real-Ip", "1.2.3.4")
+				r.RemoteAddr = "192.168.1.1:61234"
+				return r
+			}(),
+			statusCode: http.StatusUnauthorized,
+			body:       "Unauthorized\n",
+		},
+		{
+			name: "AuthorizedNetworksFromXForwardedFor",
+			handler: AuthHandler{
+				AuthorizedNetworks: []net.IPNet{
+					validNetwork,
+				},
+				TrustedProxyNetworks: []net.IPNet{
+					trustedProxyNetwork,
+				},
+			},
+			request: func() *http.Request {
+				r := httptest.NewRequest("", "/", nil)
+				r.Header.Set("X-Forwarded-For", "80.10.0.1, 1.2.3.4")
+				r.RemoteAddr = "172.16.1.1:61234"
+				return r
+			}(),
+			statusCode: http.StatusOK,
+			body:       "",
+		},
+		{
+			name: "AuthorizedNetworksFromXForwardedFor",
+			handler: AuthHandler{
+				AuthorizedNetworks: []net.IPNet{
+					validNetwork,
+				},
+				TrustedProxyNetworks: []net.IPNet{
+					trustedProxyNetwork,
+				},
+			},
+			request: func() *http.Request {
+				r := httptest.NewRequest("", "/", nil)
+				r.Header.Set("X-Forwarded-For", "80.10.0.1, 1.2.3.4")
+				r.RemoteAddr = "192.168.1.1:61234"
+				return r
+			}(),
+			statusCode: http.StatusUnauthorized,
+			body:       "Unauthorized\n",
 		},
 		{
 			name: "PostAuthWithContenxt",
