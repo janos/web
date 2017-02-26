@@ -18,7 +18,7 @@ func ChainHandlers(handlers ...func(http.Handler) http.Handler) (h http.Handler)
 
 // FinalHandler is a helper function to wrap the last http.Handler element
 // in the ChainHandlers function.
-func FinalHandler(h http.Handler) func(h http.Handler) http.Handler {
+func FinalHandler(h http.Handler) func(http.Handler) http.Handler {
 	return func(_ http.Handler) http.Handler {
 		return h
 	}
@@ -26,7 +26,7 @@ func FinalHandler(h http.Handler) func(h http.Handler) http.Handler {
 
 // FinalHandler is a helper function to wrap the last function with signature
 // func(w http.ResponseWriter, r *http.Request) in the ChainHandlers function.
-func FinalHandlerFunc(h func(w http.ResponseWriter, r *http.Request)) func(h http.Handler) http.Handler {
+func FinalHandlerFunc(h func(w http.ResponseWriter, r *http.Request)) func(http.Handler) http.Handler {
 	return func(_ http.Handler) http.Handler {
 		return http.HandlerFunc(h)
 	}
