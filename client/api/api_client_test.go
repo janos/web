@@ -677,7 +677,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("JSONSyntaxError", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "json invalid character '1' looking for beginning of object key string, offset: 2"
+		want := "json invalid character '1' looking for beginning of object key string, line: 1, column: 2"
 		if err := client.JSON("GET", "/syntax-error.json", nil, nil, &TestResponseJSON{}); err == nil || err.Error() != want {
 			t.Errorf("expected error %q, got %q", want, err)
 		}
@@ -685,7 +685,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("JSONTypeError", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "expected json string value but got number, offset 13"
+		want := "expected json string value but got number, line: 1, column: 13"
 		if err := client.JSON("GET", "/type-error.json", nil, nil, &TestResponseJSON{}); err == nil || err.Error() != want {
 			t.Errorf("expected error %q, got %q", want, err)
 		}
@@ -861,7 +861,7 @@ func TestClient(t *testing.T) {
 
 	t.Run("ErrorWithJSONSyntaxError", func(t *testing.T) {
 		client := New(ts.URL, nil)
-		want := "json invalid character '1' looking for beginning of object key string, offset: 2"
+		want := "json invalid character '1' looking for beginning of object key string, line: 1, column: 2"
 		code := 404
 		_, err := client.Request("GET", "/json-syntax-error", nil, nil, nil)
 		errLocal, ok := err.(*Error)
@@ -902,7 +902,7 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("ErrorFromErrorRegistry", func(t *testing.T) {
-		registry := NewMapErrorRegistry(nil)
+		registry := NewMapErrorRegistry(nil, nil)
 		code := 1000
 		if err := registry.AddError(code, errTest); err != nil {
 			t.Error(err.Error())
@@ -916,6 +916,24 @@ func TestClient(t *testing.T) {
 		}
 		if _, _, err := client.Stream("GET", "/error-1000", nil, nil, nil); err != errTest {
 			t.Errorf("expected error %v, got %v", errTest, err)
+		}
+	})
+
+	t.Run("ErrorFromErrorRegistryHandler", func(t *testing.T) {
+		registry := NewMapErrorRegistry(nil, nil)
+		code := 1000
+		if err := registry.AddHandler(code, errHandler); err != nil {
+			t.Error(err.Error())
+		}
+		client := New(ts.URL, registry)
+		if _, err := client.Request("GET", "/error-1000", nil, nil, nil); err != errHandlerTest {
+			t.Errorf("expected error %v, got %v", errHandlerTest, err)
+		}
+		if err := client.JSON("GET", "/error-1000", nil, nil, nil); err != errHandlerTest {
+			t.Errorf("expected error %v, got %v", errHandlerTest, err)
+		}
+		if _, _, err := client.Stream("GET", "/error-1000", nil, nil, nil); err != errHandlerTest {
+			t.Errorf("expected error %v, got %v", errHandlerTest, err)
 		}
 	})
 }
