@@ -6,6 +6,7 @@
 package apiClient
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 )
 
 type TestResponseJSON struct {
@@ -57,6 +59,11 @@ func TestClient(t *testing.T) {
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`{"code":1000}`))
+		case "/2s-request":
+			time.Sleep(2 * time.Second)
+			w.Header().Set("Content-Type", contentType)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"code":200}`))
 		default:
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -934,6 +941,24 @@ func TestClient(t *testing.T) {
 		}
 		if _, _, err := client.Stream("GET", "/error-1000", nil, nil, nil); err != errHandlerTest {
 			t.Errorf("expected error %v, got %v", errHandlerTest, err)
+		}
+	})
+
+	t.Run("Context", func(t *testing.T) {
+		client := New(ts.URL, nil)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		_, err := client.RequestContext(ctx, "GET", "/2s-request", nil, nil, nil)
+		if !strings.Contains(err.Error(), context.DeadlineExceeded.Error()) {
+			t.Errorf("expected error %v, got %v", context.DeadlineExceeded, err)
+		}
+		err = client.JSONContext(ctx, "GET", "/2s-request", nil, nil, nil)
+		if !strings.Contains(err.Error(), context.DeadlineExceeded.Error()) {
+			t.Errorf("expected error %v, got %v", context.DeadlineExceeded, err)
+		}
+		_, _, err = client.StreamContext(ctx, "GET", "/2s-request", nil, nil, nil)
+		if !strings.Contains(err.Error(), context.DeadlineExceeded.Error()) {
+			t.Errorf("expected error %v, got %v", context.DeadlineExceeded, err)
 		}
 	})
 }
