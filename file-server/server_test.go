@@ -43,6 +43,49 @@ func TestServer(t *testing.T) {
 	}
 }
 
+func TestServerAltDir(t *testing.T) {
+	dir, err := ioutil.TempDir("", "file-server-test")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	content := "file content"
+
+	f, err := ioutil.TempFile(dir, "")
+	_, err = f.WriteString(content)
+	if err != nil {
+		t.Error(err)
+	}
+	_, fn := filepath.Split(f.Name())
+	f.Close()
+
+	altDir, err := ioutil.TempDir("", "file-server-test-alt")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	content = "file alt content"
+
+	err = ioutil.WriteFile(filepath.Join(altDir, fn), []byte(content), 0666)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r := httptest.NewRequest("", "/assets/"+fn, nil)
+	w := httptest.NewRecorder()
+
+	New("/assets", dir, &Options{
+		AltDir: altDir,
+	}).ServeHTTP(w, r)
+
+	body := w.Body.String()
+	if body != content {
+		t.Errorf("expected content %q, got %q", content, body)
+	}
+}
+
 func TestServerFileNotFound(t *testing.T) {
 	dir, err := ioutil.TempDir("", "file-server-test")
 	if err != nil {
