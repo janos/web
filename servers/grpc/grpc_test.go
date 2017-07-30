@@ -13,7 +13,7 @@ import (
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"resenje.org/httputils/servers/grpc/internal/hello"
+	"resenje.org/web/servers/grpc/internal/hello"
 )
 
 type server struct{}

@@ -1,8 +1,8 @@
 # A collection of HTTP utilities for Go
 
-[![GoDoc](https://godoc.org/resenje.org/httputils?status.svg)](https://godoc.org/resenje.org/httputils)
-[![Build Status](https://travis-ci.org/janos/httputils.svg?branch=master)](https://travis-ci.org/janos/httputils)
+[![GoDoc](https://godoc.org/resenje.org/web?status.svg)](https://godoc.org/resenje.org/web)
+[![Build Status](https://travis-ci.org/janos/web.svg?branch=master)](https://travis-ci.org/janos/web)
 
 ## Installation
 
-Run `go get resenje.org/httputils` from command line.
+Run `go get resenje.org/web` from command line.

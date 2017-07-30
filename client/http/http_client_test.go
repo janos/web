@@ -111,7 +111,7 @@ func TestClientRetryFailure(t *testing.T) {
 }
 
 func TestClientRedirectHeaders(t *testing.T) {
-	want := "test httputils"
+	want := "test web"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/redirect" {
 			http.Redirect(w, r, "/", http.StatusFound)

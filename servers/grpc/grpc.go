@@ -12,7 +12,7 @@ import (
 )
 
 // Server wraps grpc.Server to provide methods for
-// resenje.org/httputils/servers.Server interface.
+// resenje.org/web/servers.Server interface.
 type Server struct {
 	*grpc.Server
 }
