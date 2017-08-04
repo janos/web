@@ -35,14 +35,14 @@ var ErrUnknownTemplate = fmt.Errorf("unknown template")
 
 // Options holds parameters for creating Templates.
 type Options struct {
-	baseDir     string
-	contentType string
-	files       map[string][]string
-	strings     map[string][]string
-	functions   template.FuncMap
-	delimOpen   string
-	delimClose  string
-	logf        func(format string, a ...interface{})
+	fileFindFunc func(filename string) string
+	contentType  string
+	files        map[string][]string
+	strings      map[string][]string
+	functions    template.FuncMap
+	delimOpen    string
+	delimClose   string
+	logf         func(format string, a ...interface{})
 }
 
 // Option sets parameters used in New function.
@@ -57,7 +57,18 @@ func WithContentType(contentType string) Option {
 // WithBaseDir sets the directory in which template files
 // are stored.
 func WithBaseDir(dir string) Option {
-	return func(o *Options) { o.baseDir = dir }
+	return func(o *Options) {
+		o.fileFindFunc = func(f string) string {
+			return filepath.Join(dir, f)
+		}
+	}
+}
+
+// WithFileFindFunc sets the function that will return the
+// file path on disk based on filename provided from files
+// defind using WithTemplateFromFile or WithTemplateFromFiles.
+func WithFileFindFunc(fn func(filename string) string) Option {
+	return func(o *Options) { o.fileFindFunc = fn }
 }
 
 // WithTemplateFromFiles adds a template parsed from files.
@@ -157,7 +168,7 @@ func New(opts ...Option) (t *Templates, err error) {
 	for name, files := range o.files {
 		fs := []string{}
 		for _, f := range files {
-			fs = append(fs, filepath.Join(o.baseDir, f))
+			fs = append(fs, o.fileFindFunc(f))
 		}
 		tpl, err := parseFiles(template.New("").Funcs(o.functions).Delims(o.delimOpen, o.delimClose), fs...)
 		if err != nil {
