@@ -58,7 +58,7 @@ func TestRedirectWithQuery(t *testing.T) {
 }
 
 func TestOpen(t *testing.T) {
-	f, err := open("", "utils_test.go")
+	f, err := open("", "utils_test.go", nil)
 	if err != nil {
 		t.Error(err)
 	}
