@@ -104,7 +104,7 @@ func TestServerShutdown(t *testing.T) {
 	s.Shutdown(context.Background())
 
 	r, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
-	if err.Error() != "rpc error: code = Unavailable desc = grpc: the connection is unavailable" {
+	if err.Error() != "rpc error: code = Unavailable desc = all SubConns are in TransientFailure" {
 		t.Fatal(err)
 	}
 }
