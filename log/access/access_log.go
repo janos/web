@@ -31,6 +31,10 @@ func (l *responseLogger) Flush() {
 	l.w.(http.Flusher).Flush()
 }
 
+func (l *responseLogger) Push(target string, opts *http.PushOptions) error {
+	return l.w.(http.Pusher).Push(target, opts)
+}
+
 func (l *responseLogger) Write(b []byte) (int, error) {
 	if l.status == 0 {
 		// The status will be StatusOK if WriteHeader has not been called yet
