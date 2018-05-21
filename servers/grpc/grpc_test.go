@@ -104,8 +104,8 @@ func TestServerShutdown(t *testing.T) {
 	s.Shutdown(context.Background())
 
 	r, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
-	if err.Error() != "rpc error: code = Unavailable desc = all SubConns are in TransientFailure" {
-		t.Fatal(err)
+	if !strings.Contains(err.Error(), "connection refused") {
+		t.Fatalf("unexpected error: %q", err)
 	}
 }
 

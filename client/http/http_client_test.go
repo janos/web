@@ -94,7 +94,7 @@ func TestClientRetryFailure(t *testing.T) {
 	}()
 
 	r, err := New(&Options{RetryTimeMax: 1 * time.Second}).Get(fmt.Sprintf("http://localhost:%d", port))
-	if err == nil || !strings.Contains(err.Error(), "getsockopt: connection refused") {
+	if err == nil || !strings.Contains(err.Error(), "connection refused") {
 		t.Errorf("expected connection refused error, got %#v", err)
 	}
 	if r != nil {
@@ -102,7 +102,7 @@ func TestClientRetryFailure(t *testing.T) {
 	}
 
 	r, err = (&http.Client{Transport: Transport(&Options{RetryTimeMax: 1 * time.Second})}).Get(fmt.Sprintf("http://localhost:%d", port))
-	if err == nil || !strings.Contains(err.Error(), "getsockopt: connection refused") {
+	if err == nil || !strings.Contains(err.Error(), "connection refused") {
 		t.Errorf("expected connection refused error, got %#v", err)
 	}
 	if r != nil {
