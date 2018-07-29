@@ -10,6 +10,13 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"resenje.org/web/servers"
+)
+
+var (
+	_ servers.Server    = new(Server)
+	_ servers.TCPServer = new(Server)
 )
 
 // Options struct holds parameters that can be configure using
@@ -47,11 +54,11 @@ func New(handler http.Handler, opts ...Option) (s *Server) {
 	return
 }
 
-// Serve executes http.Server.Serve method.
+// ServeTCP executes http.Server.Serve method.
 // If the provided listener is net.TCPListener, keep alive
 // will be enabled. If server is configured with TLS,
 // a tls.Listener will be created with provided listener.
-func (s *Server) Serve(ln net.Listener) (err error) {
+func (s *Server) ServeTCP(ln net.Listener) (err error) {
 	if l, ok := ln.(*net.TCPListener); ok {
 		ln = tcpKeepAliveListener{TCPListener: l}
 	}

@@ -31,7 +31,7 @@ func TestServer(t *testing.T) {
 	addr := "http://localhost:" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
 
 	go func() {
-		if err := s.Serve(ln); err != nil && err != http.ErrServerClosed {
+		if err := s.ServeTCP(ln); err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
 	}()
@@ -102,7 +102,7 @@ viBngkOY/zwTS9mYvM8ixsj16b2WWzajtjhBtihs+tur
 	addr := "https://localhost:" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
 
 	go func() {
-		if err := s.Serve(ln); err != nil && err != http.ErrServerClosed {
+		if err := s.ServeTCP(ln); err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
 	}()

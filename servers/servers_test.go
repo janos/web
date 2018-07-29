@@ -39,7 +39,7 @@ func newMockServer() *mockServer {
 	}
 }
 
-func (s *mockServer) Serve(ln net.Listener) error {
+func (s *mockServer) ServeTCP(ln net.Listener) error {
 	s.ln = ln
 	s.serving <- struct{}{}
 	if s.fail {
@@ -164,7 +164,7 @@ func newPanicServer() *panicServer {
 	}
 }
 
-func (s *panicServer) Serve(_ net.Listener) error {
+func (s *panicServer) ServeTCP(_ net.Listener) error {
 	s.serving <- struct{}{}
 	panic("")
 }
@@ -366,7 +366,7 @@ func TestServerFailure(t *testing.T) {
 	}
 }
 
-func TestServerAddr(t *testing.T) {
+func TestServerTCPAddr(t *testing.T) {
 	var buf Buffer
 	log.SetOutput(&buf)
 
@@ -382,12 +382,12 @@ func TestServerAddr(t *testing.T) {
 
 	<-m.serving
 
-	a := s.Addr("mock").String()
+	a := s.TCPAddr("mock").String()
 	if a != m.ln.Addr().String() {
 		t.Errorf("got %q, expected %q", a, m.ln.Addr().String())
 	}
 
-	u := s.Addr("unknown")
+	u := s.TCPAddr("unknown")
 	if u != nil {
 		t.Errorf("got %v, expected %v", u, nil)
 	}

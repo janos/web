@@ -36,7 +36,7 @@ func TestServer(t *testing.T) {
 	addr := "localhost:" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
 
 	go func() {
-		if err := s.Serve(ln); err != nil {
+		if err := s.ServeTCP(ln); err != nil {
 			panic(err)
 		}
 	}()
@@ -75,7 +75,7 @@ func TestServerShutdown(t *testing.T) {
 	addr := "localhost:" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
 
 	go func() {
-		if err := s.Serve(ln); err != nil {
+		if err := s.ServeTCP(ln); err != nil {
 			if e, ok := err.(*net.OpError); !(ok && e.Op == "accept") {
 				panic(err)
 			}
@@ -123,7 +123,7 @@ func TestServerClose(t *testing.T) {
 	addr := "localhost:" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
 
 	go func() {
-		if err := s.Serve(ln); err != nil {
+		if err := s.ServeTCP(ln); err != nil {
 			if e, ok := err.(*net.OpError); !(ok && e.Op == "accept") {
 				panic(err)
 			}

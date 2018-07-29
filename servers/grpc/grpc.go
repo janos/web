@@ -7,8 +7,15 @@ package grpcServer
 
 import (
 	"context"
+	"net"
 
 	"google.golang.org/grpc"
+	"resenje.org/web/servers"
+)
+
+var (
+	_ servers.Server    = new(Server)
+	_ servers.TCPServer = new(Server)
 )
 
 // Server wraps grpc.Server to provide methods for
@@ -22,6 +29,11 @@ func New(server *grpc.Server) (s *Server) {
 	return &Server{
 		Server: server,
 	}
+}
+
+// ServeTCP serves request on TCP listener.
+func (s *Server) ServeTCP(ln net.Listener) (err error) {
+	return s.Server.Serve(ln)
 }
 
 // Close executes grpc.Server.Stop method.

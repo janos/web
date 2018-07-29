@@ -65,10 +65,9 @@ func New(opts ...Option) (s *Servers) {
 
 // Server defines required methods for a type that can be added to
 // the Servers.
+// In addition to this methods, a Server should implement TCPServer
+// or UDPServer to be able to serve requests.
 type Server interface {
-	// Serve should start server responding to requests.
-	// The listener is initialized and already listening.
-	Serve(ln net.Listener) error
 	// Close should stop server from serving all existing requests
 	// and stop accepting new ones.
 	// The listener provided in Serve method must stop listening.
@@ -80,11 +79,26 @@ type Server interface {
 	Shutdown(ctx context.Context) error
 }
 
+// TCPServer defines methods for a server that accepts requests
+// over TCP listener.
+type TCPServer interface {
+	// Serve should start server responding to requests.
+	// The listener is initialized and already listening.
+	ServeTCP(ln net.Listener) error
+}
+
+// UDPServer defines methods for a server that accepts requests
+// over UDP listener.
+type UDPServer interface {
+	ServeUDP(conn *net.UDPConn) error
+}
+
 type server struct {
 	Server
 	name    string
 	address string
 	tcpAddr *net.TCPAddr
+	udpAddr *net.UDPAddr
 }
 
 func (s *server) label() string {
@@ -92,6 +106,16 @@ func (s *server) label() string {
 		return "server"
 	}
 	return s.name + " server"
+}
+
+func (s *server) isTCP() (srv TCPServer, yes bool) {
+	srv, yes = s.Server.(TCPServer)
+	return
+}
+
+func (s *server) isUDP() (srv UDPServer, yes bool) {
+	srv, yes = s.Server.(UDPServer)
+	return
 }
 
 // Add adds a new server instance by a custom name and with
@@ -110,49 +134,95 @@ func (s *Servers) Add(name, address string, srv Server) {
 // New new servers must be added after this methid is called.
 func (s *Servers) Serve() (err error) {
 	lns := make([]net.Listener, len(s.servers))
+	conns := make([]*net.UDPConn, len(s.servers))
 	for i, srv := range s.servers {
-		ln, err := net.Listen("tcp", srv.address)
-		if err != nil {
-			for _, l := range lns {
-				if l == nil {
-					continue
+		if _, yes := srv.isTCP(); yes {
+			ln, err := net.Listen("tcp", srv.address)
+			if err != nil {
+				for _, l := range lns {
+					if l == nil {
+						continue
+					}
+					if err := l.Close(); err != nil {
+						s.logger.Errorf("%s tcp listener %q close: %v", srv.label(), srv.address, err)
+					}
 				}
-				if err := l.Close(); err != nil {
-					s.logger.Errorf("%s listener %q close: %v", srv.label(), srv.address, err)
-				}
+				return fmt.Errorf("%s tcp listener %q: %v", srv.label(), srv.address, err)
 			}
-			return fmt.Errorf("%s listener %q: %v", srv.label(), srv.address, err)
+			lns[i] = ln
 		}
-		lns[i] = ln
+		if _, yes := srv.isUDP(); yes {
+			addr, err := net.ResolveUDPAddr("udp", srv.address)
+			if err != nil {
+				return fmt.Errorf("%s resolve udp address %q: %v", srv.label(), srv.address, err)
+			}
+			conn, err := net.ListenUDP("udp", addr)
+			if err != nil {
+				return fmt.Errorf("%s udp listener %q: %v", srv.label(), srv.address, err)
+			}
+			conns[i] = conn
+		}
 	}
 	for i, srv := range s.servers {
-		go func(srv *server, ln net.Listener) {
-			defer s.recover()
+		if tcpSrv, yes := srv.isTCP(); yes {
+			go func(srv *server, ln net.Listener) {
+				defer s.recover()
 
-			s.mu.Lock()
-			srv.tcpAddr = ln.Addr().(*net.TCPAddr)
-			s.mu.Unlock()
+				s.mu.Lock()
+				srv.tcpAddr = ln.Addr().(*net.TCPAddr)
+				s.mu.Unlock()
 
-			s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
-			if err = srv.Serve(ln); err != nil {
-				s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
-			}
-		}(srv, lns[i])
+				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
+				if err = tcpSrv.ServeTCP(ln); err != nil {
+					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
+				}
+			}(srv, lns[i])
+		}
+		if udpSrv, yes := srv.isUDP(); yes {
+			go func(srv *server, conn *net.UDPConn) {
+				defer s.recover()
+
+				s.mu.Lock()
+				srv.udpAddr = conn.LocalAddr().(*net.UDPAddr)
+				s.mu.Unlock()
+
+				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
+				if err = udpSrv.ServeUDP(conn); err != nil {
+					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
+				}
+			}(srv, conns[i])
+		}
 	}
 	return nil
 }
 
-// Addr returns a TCP address of the listener that a server
+// TCPAddr returns a TCP address of the listener that a server
 // with a specific name is using. If there are more servers
 // with the same name, the address of the first started server
 // is returned.
-func (s *Servers) Addr(name string) (a *net.TCPAddr) {
+func (s *Servers) TCPAddr(name string) (a *net.TCPAddr) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	for _, srv := range s.servers {
 		if srv.name == name {
 			return srv.tcpAddr
+		}
+	}
+	return nil
+}
+
+// UDPAddr returns a UDP address of the listener that a server
+// with a specific name is using. If there are more servers
+// with the same name, the address of the first started server
+// is returned.
+func (s *Servers) UDPAddr(name string) (a *net.UDPAddr) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for _, srv := range s.servers {
+		if srv.name == name {
+			return srv.udpAddr
 		}
 	}
 	return nil
