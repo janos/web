@@ -173,7 +173,7 @@ func (s *Servers) Serve() (err error) {
 				s.mu.Unlock()
 
 				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
-				if err = tcpSrv.ServeTCP(ln); err != nil {
+				if err := tcpSrv.ServeTCP(ln); err != nil {
 					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
 				}
 			}(srv, lns[i])
@@ -187,7 +187,7 @@ func (s *Servers) Serve() (err error) {
 				s.mu.Unlock()
 
 				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
-				if err = udpSrv.ServeUDP(conn); err != nil {
+				if err := udpSrv.ServeUDP(conn); err != nil {
 					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
 				}
 			}(srv, conns[i])
