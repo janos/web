@@ -57,8 +57,14 @@ func relativeTimeFunc(t time.Time) string {
 		return fmt.Sprintf("%d hours ago", d/time.Hour)
 	case d < 2*day:
 		return "one day ago"
+	case d < 30*day:
+		return fmt.Sprintf("%d days ago", d/day)
+	case d < 60*day:
+		return "one month ago"
+	case d < 2*365*day:
+		return fmt.Sprintf("%d months ago", d/30/day)
 	}
-	return fmt.Sprintf("%d days ago", d/day)
+	return fmt.Sprintf("%d years ago", d/365/day)
 }
 
 func yearRangeFunc(year int) string {
