@@ -728,3 +728,38 @@ func TestServerHashedPathError(t *testing.T) {
 		t.Errorf("expected path %q, got %q", "", p)
 	}
 }
+
+func TestServerGetHashedPath(t *testing.T) {
+	dir, err := ioutil.TempDir("", "file-server-test")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	content := "gopher"
+	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
+	_, err = f.WriteString(content)
+	if err != nil {
+		t.Error(err)
+	}
+	f.Close()
+
+	h := New("/assets", dir, &Options{
+		Hasher: MD5Hasher{8},
+	})
+
+	r := httptest.NewRequest("", "/assets/data.12345678.txt", nil)
+	w := httptest.NewRecorder()
+
+	h.ServeHTTP(w, r)
+
+	code := w.Result().StatusCode
+	if code != http.StatusOK {
+		t.Errorf("expected status code %d, got %d", http.StatusOK, code)
+	}
+
+	body := w.Body.String()
+	if body != content {
+		t.Errorf("expected content %q, got %q", content, body)
+	}
+}

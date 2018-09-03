@@ -64,12 +64,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if (s.Hasher != nil && !s.NoHashQueryStrings) ||
 		(s.Hasher != nil && s.NoHashQueryStrings && len(r.URL.RawQuery) == 0) {
 		cPath := s.canonicalPath(p)
-		h, err := s.hash(cPath)
-		if err != errNotRegularFile { // continue as usual if it is not a regular file
-			if err != nil {
-				s.httpError(w, r, err)
-				return
-			}
+		h, cont, err := s.hash(cPath)
+		switch err {
+		case errNotRegularFile: // continue as usual if it is not a regular file
+		case nil:
 			if hPath := s.hashedPath(cPath, h); hPath != p {
 				redirect(w, r, path.Join(s.root, hPath))
 				return
@@ -80,6 +78,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			p = cPath
 			r.URL.Path = path.Join(s.root, cPath)
+		default:
+			if !cont {
+				s.httpError(w, r, err)
+				return
+			}
 		}
 	}
 	f, err := s.open(p)
@@ -137,7 +140,7 @@ func (s *Server) HashedPath(p string) (string, error) {
 	if s.Hasher == nil {
 		return path.Join(s.root, p), nil
 	}
-	h, err := s.hash(p)
+	h, _, err := s.hash(p)
 	if err != nil {
 		return "", err
 	}
@@ -168,7 +171,7 @@ func (s Server) httpError(w http.ResponseWriter, r *http.Request, err error) {
 	DefaultInternalServerErrorHandler.ServeHTTP(w, r)
 }
 
-func (s *Server) hash(p string) (h string, err error) {
+func (s *Server) hash(p string) (h string, cont bool, err error) {
 	s.mu.RLock()
 	h, ok := s.hashes[p]
 	s.mu.RUnlock()
@@ -178,12 +181,14 @@ func (s *Server) hash(p string) (h string, err error) {
 
 	f, err := s.open(p)
 	if err != nil {
+		cont = true
 		return
 	}
 	defer f.Close()
 
 	d, err := f.Stat()
 	if err != nil {
+		cont = true
 		return
 	}
 	if !d.Mode().IsRegular() {
