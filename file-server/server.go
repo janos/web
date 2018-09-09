@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -140,9 +141,14 @@ func (s *Server) HashedPath(p string) (string, error) {
 	if s.Hasher == nil {
 		return path.Join(s.root, p), nil
 	}
-	h, _, err := s.hash(p)
+	h, cont, err := s.hash(p)
 	if err != nil {
-		return "", err
+		if cont {
+			h, _, err = s.hashFromFilename(p)
+		}
+		if err != nil {
+			return "", err
+		}
 	}
 	return path.Join(s.root, s.hashedPath(p, h)), nil
 }
@@ -199,6 +205,53 @@ func (s *Server) hash(p string) (h string, cont bool, err error) {
 	h, err = s.Hasher.Hash(f)
 	if err != nil {
 		return
+	}
+	s.mu.Lock()
+	s.hashes[p] = h
+	s.mu.Unlock()
+	return
+}
+
+func (s *Server) hashFromFilename(p string) (h string, cont bool, err error) {
+	s.mu.RLock()
+	h, ok := s.hashes[p]
+	s.mu.RUnlock()
+	if ok {
+		return
+	}
+
+	pattern := ""
+	ext := filepath.Ext(p)
+	if ext != "" {
+		pattern = strings.TrimSuffix(p, ext) + ".*" + ext
+	} else {
+		pattern = p + ".*"
+	}
+
+	var matches []string
+	if s.AltDir != "" {
+		matches, err = filepath.Glob(filepath.Join(s.AltDir, pattern))
+		if err != nil {
+			cont = true
+			return
+		}
+	}
+	m, err := filepath.Glob(filepath.Join(s.dir, pattern))
+	if err != nil {
+		cont = true
+		return
+	}
+	matches = append(matches, m...)
+
+	for _, match := range matches {
+		if strings.HasSuffix(s.canonicalPath(match), p) {
+			h = strings.TrimSuffix(match, ext)
+			h = filepath.Ext(h)
+			h = strings.TrimLeft(h, ".")
+			if !s.Hasher.IsHash(h) {
+				return "", true, errNotFound
+			}
+		}
 	}
 	s.mu.Lock()
 	s.hashes[p] = h
