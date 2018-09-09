@@ -45,6 +45,9 @@ type Options struct {
 	// Filesystem is optional and is used for opening files. In case of
 	// nil, os.Open will be used to open files.
 	Filesystem http.FileSystem
+	// Filenames are used to find corresponding files with hashes in them
+	// by just iterating through them instead doing filesystem operations.
+	Filenames []string
 
 	// NotFoundHandler is used when no file can be found.
 	NotFoundHandler http.Handler

@@ -220,28 +220,46 @@ func (s *Server) hashFromFilename(p string) (h string, cont bool, err error) {
 		return
 	}
 
-	pattern := ""
 	ext := filepath.Ext(p)
-	if ext != "" {
-		pattern = strings.TrimSuffix(p, ext) + ".*" + ext
-	} else {
-		pattern = p + ".*"
-	}
-
+	fn := strings.TrimSuffix(p, ext)
 	var matches []string
-	if s.AltDir != "" {
-		matches, err = filepath.Glob(filepath.Join(s.AltDir, pattern))
+
+	if s.Filenames != nil {
+		prefix := filepath.Join(s.dir, fn)
+		altPrefix := filepath.Join(s.AltDir, fn)
+		for _, filename := range s.Filenames {
+			if s.AltDir != "" {
+				if strings.HasPrefix(filename, altPrefix) {
+					matches = append(matches, filename)
+				}
+			}
+			if strings.HasPrefix(filename, prefix) {
+				matches = append(matches, filename)
+			}
+		}
+	} else {
+		pattern := ""
+		if ext != "" {
+			pattern = fn + ".*" + ext
+		} else {
+			pattern = p + ".*"
+		}
+
+		if s.AltDir != "" {
+			matches, err = filepath.Glob(filepath.Join(s.AltDir, pattern))
+			if err != nil {
+				cont = true
+				return
+			}
+		}
+		var m []string
+		m, err = filepath.Glob(filepath.Join(s.dir, pattern))
 		if err != nil {
 			cont = true
 			return
 		}
+		matches = append(matches, m...)
 	}
-	m, err := filepath.Glob(filepath.Join(s.dir, pattern))
-	if err != nil {
-		cont = true
-		return
-	}
-	matches = append(matches, m...)
 
 	for _, match := range matches {
 		if strings.HasSuffix(s.canonicalPath(match), p) {

@@ -817,3 +817,69 @@ func TestServerHashedPathFromFilenameWithAltDir(t *testing.T) {
 		t.Errorf("expected hashed path %q, got %q", expected, got)
 	}
 }
+
+func TestServerHashedPathFromFilenameWithFilenames(t *testing.T) {
+	dir, err := ioutil.TempDir("", "file-server-test")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	content := "gopher"
+	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
+	_, err = f.WriteString(content)
+	if err != nil {
+		t.Error(err)
+	}
+	f.Close()
+
+	h := New("/assets", dir, &Options{
+		Hasher:    MD5Hasher{8},
+		Filenames: []string{filepath.Join(dir, "data.abcdef01.txt")},
+	})
+
+	got, err := h.HashedPath("data.txt")
+	if err != nil {
+		t.Error(err)
+	}
+	expected := "/assets/data.abcdef01.txt"
+	if got != expected {
+		t.Errorf("expected hashed path %q, got %q", expected, got)
+	}
+}
+
+func TestServerHashedPathFromFilenameWithAltDirWithFilenames(t *testing.T) {
+	dir, err := ioutil.TempDir("", "file-server-test")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	altDir, err := ioutil.TempDir("", "file-server-test-alt")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir)
+
+	content := "file alt content"
+
+	err = ioutil.WriteFile(filepath.Join(altDir, "data.12345678.txt"), []byte(content), 0666)
+	if err != nil {
+		t.Error(err)
+	}
+
+	h := New("/assets", dir, &Options{
+		Hasher:    MD5Hasher{8},
+		AltDir:    altDir,
+		Filenames: []string{filepath.Join(altDir, "data.abcdef01.txt")},
+	})
+
+	got, err := h.HashedPath("data.txt")
+	if err != nil {
+		t.Error(err)
+	}
+	expected := "/assets/data.abcdef01.txt"
+	if got != expected {
+		t.Errorf("expected hashed path %q, got %q", expected, got)
+	}
+}
