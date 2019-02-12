@@ -144,7 +144,12 @@ func (s *FileStore) On() (changed bool, err error) {
 
 // Off disables maintenance.
 func (s *FileStore) Off() (changed bool, err error) {
-	if _, err = os.Stat(s.filename); os.IsNotExist(err) {
+	_, err = os.Stat(s.filename)
+	if os.IsNotExist(err) {
+		err = nil
+		return
+	}
+	if err != nil {
 		return
 	}
 	if err = os.Remove(s.filename); err != nil {
