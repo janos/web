@@ -273,6 +273,11 @@ func (s Service) TextHandler(h http.Handler) http.Handler {
 	})
 }
 
+// Status returns whether the maintenance mode is enabled.
+func (s Service) Status() (on bool, err error) {
+	return s.store.Status()
+}
+
 // StatusHandler can be used in JSON-encoded HTTP API
 // to check the status of maintenance.
 func (s Service) StatusHandler(w http.ResponseWriter, r *http.Request) {
