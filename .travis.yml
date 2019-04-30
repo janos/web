@@ -3,6 +3,10 @@ language: go
 go:
   - 1.12.4
 
+env:
+  global:
+    - GO111MODULE=on
+
 install:
   - go get -v resenje.org/web/...
 
