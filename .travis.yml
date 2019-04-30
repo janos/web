@@ -6,6 +6,7 @@ go:
 env:
   global:
     - GO111MODULE=on
+    - GOPROXY=https://proxy.golang.org
 
 install:
   - go get -v resenje.org/web/...
