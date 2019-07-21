@@ -6,8 +6,7 @@ require (
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/handlers v1.4.1
-	github.com/lucas-clemente/quic-go v0.11.2
-	github.com/marten-seemann/qtls v0.3.2 // indirect
+	github.com/lucas-clemente/quic-go v0.11.1
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/prometheus/client_golang v1.0.0
