@@ -9,7 +9,7 @@ package web
 // request based on HTML form data.
 type FormErrors struct {
 	Errors      []string            `json:"errors,omitempty"`
-	FieldErrors map[string][]string `json:"field-errors,omitempty"`
+	FieldErrors map[string][]string `json:"field_errors,omitempty"`
 }
 
 // AddError appends an error to a list of general errors.
