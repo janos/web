@@ -11,7 +11,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/lucas-clemente/quic-go/h2quic"
+	"github.com/lucas-clemente/quic-go/http3"
 	"resenje.org/web/servers"
 )
 
@@ -34,10 +34,10 @@ type Option func(*Options)
 // and creates a TLS listener.
 func WithTLSConfig(tlsConfig *tls.Config) Option { return func(o *Options) { o.tlsConfig = tlsConfig } }
 
-// Server wraps h2quic.Server to provide methods for
+// Server wraps http3.Server to provide methods for
 // resenje.org/web/servers.Server interface.
 type Server struct {
-	*h2quic.Server
+	*http3.Server
 }
 
 // New creates a new instance of Server.
@@ -47,7 +47,7 @@ func New(handler http.Handler, opts ...Option) (s *Server) {
 		opt(o)
 	}
 	s = &Server{
-		Server: &h2quic.Server{
+		Server: &http3.Server{
 			Server: &http.Server{
 				Handler:   handler,
 				TLSConfig: o.tlsConfig,
@@ -63,7 +63,7 @@ func (s *Server) ServeUDP(conn *net.UDPConn) (err error) {
 	return s.Server.Serve(conn)
 }
 
-// Shutdown calls h2quic.Server.Close method.
+// Shutdown calls http3.Server.Close method.
 func (s *Server) Shutdown(_ context.Context) (err error) {
 	return s.Server.Close()
 }
