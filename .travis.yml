@@ -1,12 +1,7 @@
 language: go
 
 go:
-  - 1.12.4
-
-env:
-  global:
-    - GO111MODULE=on
-    - GOPROXY=https://proxy.golang.org
+  - 1.13
 
 install:
   - go get -v resenje.org/web/...
