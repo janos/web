@@ -85,8 +85,7 @@ func containsStringFunc(list []string, element, yes, no string) string {
 }
 
 func htmlBrFunc(text string) string {
-	text = template.HTMLEscapeString(text)
-	return strings.Replace(text, "\n", "<br>", -1)
+	return strings.ReplaceAll(text, "\n", "<br>")
 }
 
 func mapFunc(values ...interface{}) (map[string]interface{}, error) {
