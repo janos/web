@@ -17,18 +17,6 @@ import (
 	"resenje.org/web/recovery"
 )
 
-// Recovery handler that does not write anything to response.
-// It is useful as the firs handler in chain if a handler that
-// transforms response needs to be before other recovery handler,
-// like compress handler.
-func (s *Server) nilRecoveryHandler(h http.Handler) http.Handler {
-	return recovery.New(h,
-		recovery.WithLabel(s.Version()),
-		recovery.WithLogFunc(s.logger.Errorf),
-		recovery.WithNotifier(s.emailService),
-	)
-}
-
 func newRedirectDomainHandler(domain, httpsPort string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, port, _ := net.SplitHostPort(r.Host)

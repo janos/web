@@ -106,12 +106,12 @@ func New(o Options) (s *Server, err error) {
 	internalRouter := newInternalRouter(s)
 	if o.ListenInternal != "" {
 		s.servers.Add("internal HTTP", o.ListenInternal, httpServer.New(
-			s.nilRecoveryHandler(internalRouter),
+			internalRouter,
 		))
 	}
 	if o.ListenInternalTLS != "" {
 		s.servers.Add("internal TLS HTTP", o.ListenInternalTLS, httpServer.New(
-			s.nilRecoveryHandler(internalRouter),
+			internalRouter,
 			httpServer.WithTLSConfig(tlsConfig),
 		))
 	}
@@ -291,9 +291,7 @@ func (s *Server) WithHTTP(o HTTPOptions) (err error) {
 		if httpsPort != "" {
 			h = redirectHTTPSHandler(h, httpsPort)
 		}
-		server := httpServer.New(
-			s.nilRecoveryHandler(h),
-		)
+		server := httpServer.New(h)
 		server.IdleTimeout = idleTimeout
 		server.ReadTimeout = readTimeout
 		server.WriteTimeout = writeTimeout
@@ -306,7 +304,7 @@ func (s *Server) WithHTTP(o HTTPOptions) (err error) {
 
 	if o.ListenTLS != "" {
 		server := httpServer.New(
-			s.nilRecoveryHandler(router),
+			router,
 			httpServer.WithTLSConfig(tlsConfig),
 		)
 		server.IdleTimeout = idleTimeout
