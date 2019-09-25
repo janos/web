@@ -40,15 +40,16 @@ var ErrUnknownTemplate = fmt.Errorf("unknown template")
 
 // Options holds parameters for creating Templates.
 type Options struct {
-	fileFindFunc func(filename string) string
-	fileReadFunc FileReadFunc
-	contentType  string
-	files        map[string][]string
-	strings      map[string][]string
-	functions    template.FuncMap
-	delimOpen    string
-	delimClose   string
-	logf         func(format string, a ...interface{})
+	fileFindFunc     func(filename string) string
+	fileReadFunc     FileReadFunc
+	fileReadOnRender bool
+	contentType      string
+	files            map[string][]string
+	strings          map[string][]string
+	functions        template.FuncMap
+	delimOpen        string
+	delimClose       string
+	logf             func(format string, a ...interface{})
 }
 
 // Option sets parameters used in New function.
@@ -81,6 +82,15 @@ func WithFileFindFunc(fn func(filename string) string) Option {
 // content of template given the filename.
 func WithFileReadFunc(fn FileReadFunc) Option {
 	return func(o *Options) { o.fileReadFunc = fn }
+}
+
+// WithFileReadOnRender forces template files to be read and
+// parsed every time Render or Respond functions are called.
+// This is useful for quickly reloading template files,
+// but with a performance cost. This functionality
+// is disabled by default.
+func WithFileReadOnRender(yes bool) Option {
+	return func(o *Options) { o.fileReadOnRender = yes }
 }
 
 // WithTemplateFromFiles adds a template parsed from files.
@@ -142,6 +152,7 @@ func WithLogFunc(logf func(format string, a ...interface{})) Option {
 // Templates structure holds parsed templates.
 type Templates struct {
 	templates   map[string]*template.Template
+	parseFiles  func(name string) (*template.Template, error)
 	defaultName string
 	contentType string
 	logf        func(format string, a ...interface{})
@@ -181,16 +192,31 @@ func New(opts ...Option) (t *Templates, err error) {
 		}
 		t.templates[name] = tpl
 	}
-	for name, files := range o.files {
+
+	parse := func(files []string) (tpl *template.Template, err error) {
 		fs := []string{}
 		for _, f := range files {
 			fs = append(fs, o.fileFindFunc(f))
 		}
-		tpl, err := parseFiles(o.fileReadFunc, template.New("").Funcs(o.functions).Delims(o.delimOpen, o.delimClose), fs...)
-		if err != nil {
-			return nil, err
+		return parseFiles(o.fileReadFunc, template.New("").Funcs(o.functions).Delims(o.delimOpen, o.delimClose), fs...)
+	}
+
+	if o.fileReadOnRender {
+		t.parseFiles = func(name string) (tpl *template.Template, err error) {
+			files, ok := o.files[name]
+			if !ok {
+				return nil, &Error{Err: ErrUnknownTemplate, Template: name}
+			}
+			return parse(files)
 		}
-		t.templates[name] = tpl
+	} else {
+		for name, files := range o.files {
+			tpl, err := parse(files)
+			if err != nil {
+				return nil, err
+			}
+			t.templates[name] = tpl
+		}
 	}
 	return
 }
@@ -199,11 +225,8 @@ func New(opts ...Option) (t *Templates, err error) {
 // then writes the the status and body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
 func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templateName string, data interface{}, status int) {
+	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
-	tpl, ok := t.templates[name]
-	if !ok {
-		panic(&Error{Err: ErrUnknownTemplate, Template: name})
-	}
 	if err := tpl.ExecuteTemplate(&buf, templateName, data); err != nil {
 		panic(err)
 	}
@@ -222,11 +245,8 @@ func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templa
 // then writes the the status and body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
 func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data interface{}, status int) {
+	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
-	tpl, ok := t.templates[name]
-	if !ok {
-		panic(&Error{Err: ErrUnknownTemplate, Template: name})
-	}
 	if err := tpl.Execute(&buf, data); err != nil {
 		panic(err)
 	}
@@ -257,11 +277,8 @@ func (t Templates) Respond(w http.ResponseWriter, name string, data interface{})
 
 // RenderTemplate executes a named template and returns the string.
 func (t Templates) RenderTemplate(name, templateName string, data interface{}) (s string, err error) {
+	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
-	tpl, ok := t.templates[name]
-	if !ok {
-		return "", &Error{Err: ErrUnknownTemplate, Template: name}
-	}
 	if err := tpl.ExecuteTemplate(&buf, templateName, data); err != nil {
 		return "", err
 	}
@@ -270,15 +287,27 @@ func (t Templates) RenderTemplate(name, templateName string, data interface{}) (
 
 // Render executes a template and returns the string.
 func (t Templates) Render(name string, data interface{}) (s string, err error) {
+	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
-	tpl, ok := t.templates[name]
-	if !ok {
-		return "", &Error{Err: ErrUnknownTemplate, Template: name}
-	}
 	if err := tpl.Execute(&buf, data); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func (t Templates) mustTemplate(name string) (tpl *template.Template) {
+	tpl, ok := t.templates[name]
+	if ok {
+		return tpl
+	}
+	if t.parseFiles != nil {
+		tpl, err := t.parseFiles(name)
+		if err != nil {
+			panic(err)
+		}
+		return tpl
+	}
+	panic(&Error{Err: ErrUnknownTemplate, Template: name})
 }
 
 func parseFiles(fn FileReadFunc, t *template.Template, filenames ...string) (*template.Template, error) {
