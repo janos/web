@@ -285,11 +285,11 @@ func parseFiles(fn FileReadFunc, t *template.Template, filenames ...string) (*te
 	for _, filename := range filenames {
 		b, err := fn(filename)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("read template file %s: %v", filename, err)
 		}
 		_, err = t.Parse(string(b))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse template file %s: %v", filename, err)
 		}
 	}
 	return t, nil
