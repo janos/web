@@ -244,7 +244,6 @@ func (s *Servers) Close() {
 		}(srv)
 	}
 	wg.Wait()
-	return
 }
 
 // Shutdown gracefully stops all servers, by calling Shutdown method on each of them.
@@ -263,5 +262,4 @@ func (s *Servers) Shutdown(ctx context.Context) {
 		}(srv)
 	}
 	wg.Wait()
-	return
 }
