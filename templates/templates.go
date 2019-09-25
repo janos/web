@@ -153,7 +153,6 @@ func WithLogFunc(logf func(format string, a ...interface{})) Option {
 type Templates struct {
 	templates   map[string]*template.Template
 	parseFiles  func(name string) (*template.Template, error)
-	defaultName string
 	contentType string
 	logf        func(format string, a ...interface{})
 }
