@@ -39,8 +39,8 @@ func (l stdLogger) Errorf(format string, a ...interface{}) {
 	log.Printf("ERROR "+format, a...)
 }
 
-// Store defines methods that are reqired to check, set and remove
-// information wheather the maintenance is on of off.
+// Store defines methods that are required to check, set and remove
+// information whether the maintenance is on of off.
 // Usually only one boolean value is needed to be stored
 type Store interface {
 	// Return true if maintenance is enabled.
