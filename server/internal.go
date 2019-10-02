@@ -59,11 +59,13 @@ func newInternalRouter(s *Server) http.Handler {
 		jsonresponse.NotFound(w, nil)
 	}))
 	internalAPIRouter.Handle("/api/status", http.HandlerFunc(s.statusAPIHandler))
-	internalAPIRouter.Handle("/api/maintenance", jsonMethodHandler{
-		"GET":    http.HandlerFunc(s.maintenanceService.StatusHandler),
-		"POST":   http.HandlerFunc(s.maintenanceService.OnHandler),
-		"DELETE": http.HandlerFunc(s.maintenanceService.OffHandler),
-	})
+	if s.maintenanceService != nil {
+		internalAPIRouter.Handle("/api/maintenance", jsonMethodHandler{
+			"GET":    http.HandlerFunc(s.maintenanceService.StatusHandler),
+			"POST":   http.HandlerFunc(s.maintenanceService.OnHandler),
+			"DELETE": http.HandlerFunc(s.maintenanceService.OffHandler),
+		})
+	}
 	internalBaseRouter.Handle("/metrics", promhttp.InstrumentMetricHandler(
 		s.metricsRegistry,
 		promhttp.HandlerFor(s.metricsRegistry, promhttp.HandlerOpts{}),
