@@ -15,6 +15,10 @@ import (
 	"testing"
 )
 
+type contextKey string
+
+var contextKeyKey contextKey = "key"
+
 func TestAuthHandler(t *testing.T) {
 	_, cidr, err := net.ParseCIDR("10.0.0.0/8")
 	if err != nil {
@@ -390,11 +394,11 @@ func TestAuthHandler(t *testing.T) {
 					return
 				},
 				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error) {
-					rr = r.WithContext(context.WithValue(r.Context(), "key", entity))
+					rr = r.WithContext(context.WithValue(r.Context(), contextKeyKey, entity))
 					return
 				},
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					value, _ := r.Context().Value("key").(string)
+					value, _ := r.Context().Value(contextKeyKey).(string)
 					if value != "e1421448-5426-3346-8701-e4189e5507c0" {
 						t.Errorf("expected request context with key %q, got %q", "e1421448-5426-3346-8701-e4189e5507c0", value)
 					}
