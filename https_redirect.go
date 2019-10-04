@@ -54,8 +54,12 @@ func (l TLSListener) Accept() (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.SetKeepAlive(true)
-	c.SetKeepAlivePeriod(3 * time.Minute)
+	if err := c.SetKeepAlive(true); err != nil {
+		return nil, err
+	}
+	if err := c.SetKeepAlivePeriod(3 * time.Minute); err != nil {
+		return nil, err
+	}
 
 	b := make([]byte, 1)
 	_, err = c.Read(b)
