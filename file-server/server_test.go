@@ -25,9 +25,12 @@ func TestServer(t *testing.T) {
 	content := "file content"
 
 	f, err := ioutil.TempFile(dir, "")
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	_, fn := filepath.Split(f.Name())
 	f.Close()
@@ -53,9 +56,12 @@ func TestServerAltDir(t *testing.T) {
 	content := "file content"
 
 	f, err := ioutil.TempFile(dir, "")
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	_, fn := filepath.Split(f.Name())
 	f.Close()
