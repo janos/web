@@ -103,7 +103,7 @@ func TestServerShutdown(t *testing.T) {
 
 	s.Shutdown(context.Background())
 
-	r, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
+	_, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
 	if !strings.Contains(err.Error(), "Unavailable") {
 		t.Fatalf("unexpected error: %q", err)
 	}
@@ -151,7 +151,7 @@ func TestServerClose(t *testing.T) {
 
 	s.Close()
 
-	r, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
+	_, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
 	if !strings.Contains(err.Error(), "Unavailable") {
 		t.Fatal(err)
 	}
