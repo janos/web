@@ -101,7 +101,9 @@ func TestServerShutdown(t *testing.T) {
 		t.Errorf("got %q, expected %q", r.Message, want)
 	}
 
-	s.Shutdown(context.Background())
+	if err := s.Shutdown(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 
 	_, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
 	if !strings.Contains(err.Error(), "Unavailable") {
