@@ -251,7 +251,7 @@ func (s *Server) WithHTTP(o HTTPOptions) (err error) {
 		ClientSessionCache: tls.NewLRUClientSessionCache(-1),
 	}
 	var acmeHTTPHandler func(fallback http.Handler) http.Handler
-	if s.acmeCertsDir != "" {
+	if s.acmeCertsDir != "" && o.ListenTLS != "" {
 		certManager := autocert.Manager{
 			Prompt: autocert.AcceptTOS,
 			Cache:  autocert.DirCache(s.acmeCertsDir),
