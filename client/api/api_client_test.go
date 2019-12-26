@@ -8,6 +8,7 @@ package apiClient
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -143,14 +144,15 @@ func TestClient(t *testing.T) {
 
 	t.Run("EndpointInvalidEndpoint", func(t *testing.T) {
 		client := New("", nil)
-		want := "Get http:///: http: no Host in request URL"
-		if _, err := client.Request("GET", "/", nil, nil, nil); err.Error() != want {
+		want := "http: no Host in request URL"
+		if _, err := client.Request("GET", "/", nil, nil, nil); !strings.Contains(err.Error(), want) {
+			fmt.Printf("%#v\n", err)
 			t.Errorf("expected error %q, got %v", want, err)
 		}
-		if err := client.JSON("GET", "/", nil, nil, nil); err.Error() != want {
+		if err := client.JSON("GET", "/", nil, nil, nil); !strings.Contains(err.Error(), want) {
 			t.Errorf("expected error %q, got %v", want, err)
 		}
-		if _, _, err := client.Stream("GET", "/", nil, nil, nil); err.Error() != want {
+		if _, _, err := client.Stream("GET", "/", nil, nil, nil); !strings.Contains(err.Error(), want) {
 			t.Errorf("expected error %q, got %v", want, err)
 		}
 	})
