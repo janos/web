@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -93,17 +94,22 @@ func TestClientRetryFailure(t *testing.T) {
 		}
 	}()
 
+	wantErr := "connection refused"
+	if runtime.GOOS == "windows" {
+		wantErr = "No connection could be made because the target machine actively refused it."
+	}
+
 	r, err := New(&Options{RetryTimeMax: 1 * time.Second}).Get(fmt.Sprintf("http://localhost:%d", port))
-	if err == nil || !strings.Contains(err.Error(), "connection refused") {
-		t.Errorf("expected connection refused error, got %q", err.Error())
+	if err == nil || !strings.Contains(err.Error(), wantErr) {
+		t.Errorf("expected connection refused error, got %w", err)
 	}
 	if r != nil {
 		t.Error("unexpected not-nil response")
 	}
 
 	r, err = (&http.Client{Transport: Transport(&Options{RetryTimeMax: 1 * time.Second})}).Get(fmt.Sprintf("http://localhost:%d", port))
-	if err == nil || !strings.Contains(err.Error(), "connection refused") {
-		t.Errorf("expected connection refused error, got %q", err.Error())
+	if err == nil || !strings.Contains(err.Error(), wantErr) {
+		t.Errorf("expected connection refused error, got %w", err)
 	}
 	if r != nil {
 		t.Error("unexpected not-nil response")
