@@ -16,7 +16,7 @@ func TestChain(t *testing.T) {
 	handlers := []func(http.Handler) http.Handler{
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("0"))
+				_, _ = w.Write([]byte("0"))
 				if h != nil {
 					h.ServeHTTP(w, r)
 				}
@@ -24,7 +24,7 @@ func TestChain(t *testing.T) {
 		},
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("1"))
+				_, _ = w.Write([]byte("1"))
 				if h != nil {
 					h.ServeHTTP(w, r)
 				}
@@ -32,7 +32,7 @@ func TestChain(t *testing.T) {
 		},
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("2"))
+				_, _ = w.Write([]byte("2"))
 				if h != nil {
 					h.ServeHTTP(w, r)
 				}
@@ -57,14 +57,14 @@ func TestFinalHandler(t *testing.T) {
 	handlers := []func(http.Handler) http.Handler{
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("0"))
+				_, _ = w.Write([]byte("0"))
 				if h != nil {
 					h.ServeHTTP(w, r)
 				}
 			})
 		},
 		FinalHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("1"))
+			_, _ = w.Write([]byte("1"))
 		})),
 	}
 
@@ -85,14 +85,14 @@ func TestFinalHandlerFunc(t *testing.T) {
 	handlers := []func(http.Handler) http.Handler{
 		func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("0"))
+				_, _ = w.Write([]byte("0"))
 				if h != nil {
 					h.ServeHTTP(w, r)
 				}
 			})
 		},
 		FinalHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("1"))
+			_, _ = w.Write([]byte("1"))
 		}),
 	}
 

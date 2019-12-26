@@ -24,6 +24,9 @@ func TestNewStaticFilesHandler(t *testing.T) {
 	content := "file content"
 
 	f, err := ioutil.TempFile(dir, "")
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)

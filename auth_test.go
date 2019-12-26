@@ -57,7 +57,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				UnauthorizedHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusTeapot)
-					w.Write([]byte("Blocked"))
+					_, _ = w.Write([]byte("Blocked"))
 				}),
 			},
 			request:    httptest.NewRequest("", "/", nil),
@@ -104,7 +104,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				KeyHeaderName: "X-Key",
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Write([]byte("Passed"))
+					_, _ = w.Write([]byte("Passed"))
 				}),
 				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0"
@@ -180,7 +180,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Write([]byte("Passed"))
+					_, _ = w.Write([]byte("Passed"))
 				}),
 				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
@@ -200,7 +200,7 @@ func TestAuthHandler(t *testing.T) {
 			handler: AuthHandler{
 				BasicAuthRealm: "Key Realm",
 				Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Write([]byte("Passed"))
+					_, _ = w.Write([]byte("Passed"))
 				}),
 				AuthFunc: func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error) {
 					valid = key == "e1421448-5426-3346-8701-e4189e5507c0" || secret == "e1421448-5426-3346-8701-e4189e5507c0"
@@ -300,7 +300,7 @@ func TestAuthHandler(t *testing.T) {
 				AuthorizeAll: true,
 				PostAuthFunc: func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error) {
 					w.WriteHeader(http.StatusTeapot)
-					w.Write([]byte("Post auth"))
+					_, _ = w.Write([]byte("Post auth"))
 					return
 				},
 			},
@@ -402,7 +402,7 @@ func TestAuthHandler(t *testing.T) {
 					if value != "e1421448-5426-3346-8701-e4189e5507c0" {
 						t.Errorf("expected request context with key %q, got %q", "e1421448-5426-3346-8701-e4189e5507c0", value)
 					}
-					w.Write([]byte("Authenticated with a key"))
+					_, _ = w.Write([]byte("Authenticated with a key"))
 				}),
 			},
 			request: func() *http.Request {
@@ -423,7 +423,7 @@ func TestAuthHandler(t *testing.T) {
 				},
 				ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(err.Error()))
+					_, _ = w.Write([]byte(err.Error()))
 				},
 			},
 			request: func() *http.Request {
@@ -444,7 +444,7 @@ func TestAuthHandler(t *testing.T) {
 				},
 				ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(err.Error()))
+					_, _ = w.Write([]byte(err.Error()))
 				},
 			},
 			request: func() *http.Request {
@@ -463,7 +463,7 @@ func TestAuthHandler(t *testing.T) {
 				},
 				ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(err.Error()))
+					_, _ = w.Write([]byte(err.Error()))
 				},
 			},
 			request: func() *http.Request {
@@ -483,7 +483,7 @@ func TestAuthHandler(t *testing.T) {
 				},
 				ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(err.Error()))
+					_, _ = w.Write([]byte(err.Error()))
 				},
 			},
 			request: func() *http.Request {

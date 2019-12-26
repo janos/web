@@ -72,7 +72,9 @@ func (s *Server) Shutdown(_ context.Context) (err error) {
 // quic related headers to TCP server that suggest alternative svc.
 func (s *Server) QuicHeadersHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.SetQuicHeaders(w.Header())
+		// this error is safe to ignore as address is
+		// set from the udp connection
+		_ = s.SetQuicHeaders(w.Header())
 		h.ServeHTTP(w, r)
 	})
 }

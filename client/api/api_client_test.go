@@ -31,39 +31,39 @@ func TestClient(t *testing.T) {
 		case "/empty":
 		case "/test.html":
 			w.Header().Set("Content-Type", "text/html")
-			w.Write([]byte(`Test`))
+			_, _ = w.Write([]byte(`Test`))
 		case "/syntax-error.json":
 			w.Header().Set("Content-Type", contentType)
-			w.Write([]byte(`{1}`))
+			_, _ = w.Write([]byte(`{1}`))
 		case "/type-error.json":
 			w.Header().Set("Content-Type", contentType)
-			w.Write([]byte(`{"method":123}`))
+			_, _ = w.Write([]byte(`{"method":123}`))
 		case "/bad-request":
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`Bad data...`))
+			_, _ = w.Write([]byte(`Bad data...`))
 		case "/internal-server-error":
 			w.WriteHeader(http.StatusInternalServerError)
 		case "/entity-not-found":
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"message":"entity not found"}`))
+			_, _ = w.Write([]byte(`{"message":"entity not found"}`))
 		case "/error-invalid-message-type":
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"message":1}`))
+			_, _ = w.Write([]byte(`{"message":1}`))
 		case "/json-syntax-error":
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{1}`))
+			_, _ = w.Write([]byte(`{1}`))
 		case "/error-1000":
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"code":1000}`))
+			_, _ = w.Write([]byte(`{"code":1000}`))
 		case "/2s-request":
 			time.Sleep(2 * time.Second)
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"code":200}`))
+			_, _ = w.Write([]byte(`{"code":200}`))
 		default:
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -80,7 +80,7 @@ func TestClient(t *testing.T) {
 				t.Error(err)
 			}
 			w.Header().Set("Content-Type", contentType)
-			w.Write(b)
+			_, _ = w.Write(b)
 		}
 	}))
 	defer ts.Close()

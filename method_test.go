@@ -15,7 +15,7 @@ func TestHandleMethods_KnownMethod(t *testing.T) {
 	body := "got post"
 	methods := map[string]http.Handler{
 		"POST": http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(body))
+			_, _ = w.Write([]byte(body))
 		}),
 	}
 	contentType := "text/plain"

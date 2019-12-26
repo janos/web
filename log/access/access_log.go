@@ -23,10 +23,6 @@ func (l *responseLogger) Header() http.Header {
 	return l.w.Header()
 }
 
-func (l *responseLogger) CloseNotify() <-chan bool {
-	return l.w.(http.CloseNotifier).CloseNotify()
-}
-
 func (l *responseLogger) Flush() {
 	l.w.(http.Flusher).Flush()
 }

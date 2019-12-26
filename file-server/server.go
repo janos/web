@@ -121,7 +121,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			defer ff.Close()
 			dd, err := ff.Stat()
 			if err == nil {
-				p = index
 				d = dd
 				f = ff
 			}

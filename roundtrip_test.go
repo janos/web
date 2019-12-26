@@ -18,8 +18,13 @@ func TestRoundTripperFunc(t *testing.T) {
 		return nil, nil
 	})
 
-	r, _ := http.NewRequest(http.MethodGet, "http://localhost:8080", nil)
-	rt.RoundTrip(r)
+	r, err := http.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	if err != nil {
+		t.Error(err)
+	}
+	if _, err := rt.RoundTrip(r); err != nil {
+		t.Error(err)
+	}
 
 	got := r.Header.Get("X-Header")
 	if got != header {

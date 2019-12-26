@@ -108,7 +108,9 @@ func TestMapErrorRegistryMustAddMessageErrorPanic(t *testing.T) {
 			t.Errorf("expected error %v, got %v", ErrErrorAlreadyRegistered, err)
 		}
 	}()
-	r.MustAddMessageError(code, "message")
+	if err := r.MustAddMessageError(code, "message"); err != nil {
+		t.Error(err)
+	}
 }
 
 func TestMapErrorRegistryMustAddHandlerPanic(t *testing.T) {

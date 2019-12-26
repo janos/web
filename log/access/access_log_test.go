@@ -101,7 +101,7 @@ func TestAccessLog(t *testing.T) {
 			logHander := &logging.MemoryHandler{Formatter: &Formatter{}, Level: logging.DEBUG}
 			NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tc.statusCode)
-				w.Write([]byte("test data"))
+				_, _ = w.Write([]byte("test data"))
 			}), logging.NewLogger("test", logging.DEBUG, []logging.Handler{logHander}, 0)).ServeHTTP(w, tc.request)
 
 			logging.WaitForAllUnprocessedRecords()

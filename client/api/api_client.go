@@ -113,7 +113,7 @@ func (c Client) RequestContext(ctx context.Context, method, path string, query u
 
 	if 200 > resp.StatusCode || resp.StatusCode >= 300 {
 		defer func() {
-			io.Copy(ioutil.Discard, resp.Body)
+			_, _ = io.Copy(ioutil.Discard, resp.Body)
 			resp.Body.Close()
 		}()
 
@@ -167,7 +167,7 @@ func (c Client) RequestContext(ctx context.Context, method, path string, query u
 // Request makes a HTTP request based on Client configuration and
 // arguments provided.
 func (c Client) Request(method, path string, query url.Values, body io.Reader, accept []string) (resp *http.Response, err error) {
-	return c.RequestContext(nil, method, path, query, body, accept)
+	return c.RequestContext(context.Background(), method, path, query, body, accept)
 }
 
 // JSONContext provides the same functionality as JSON with Context instance passing to http.Request.
@@ -177,7 +177,7 @@ func (c Client) JSONContext(ctx context.Context, method, path string, query url.
 		return
 	}
 	defer func() {
-		io.Copy(ioutil.Discard, resp.Body)
+		_, _ = io.Copy(ioutil.Discard, resp.Body)
 		resp.Body.Close()
 	}()
 
@@ -205,7 +205,7 @@ func (c Client) JSONContext(ctx context.Context, method, path string, query url.
 // JSON makes a HTTP request that expects application/json response.
 // It decodes response body to a `response` argument.
 func (c Client) JSON(method, path string, query url.Values, body io.Reader, response interface{}) (err error) {
-	return c.JSONContext(nil, method, path, query, body, response)
+	return c.JSONContext(context.Background(), method, path, query, body, response)
 }
 
 // StreamContext provides the same functionality as Stream with Context instance passing to http.Request.
@@ -225,7 +225,7 @@ func (c Client) StreamContext(ctx context.Context, method, path string, query ur
 // closed at the end of read. To reuse HTTP connection, make sure that the
 // whole data is read before closing the reader.
 func (c Client) Stream(method, path string, query url.Values, body io.Reader, accept []string) (data io.ReadCloser, contentType string, err error) {
-	return c.StreamContext(nil, method, path, query, body, accept)
+	return c.StreamContext(context.Background(), method, path, query, body, accept)
 }
 
 // JSONUnmarshal decodes data into v and returns json.SyntaxError and

@@ -116,7 +116,8 @@ func Transport(options *Options) *http.Transport {
 		TLSHandshakeTimeout: options.TLSHandshakeTimeout,
 		TLSClientConfig:     &tls.Config{InsecureSkipVerify: options.TLSSkipVerify},
 	}
-	http2.ConfigureTransport(transport)
+	// this error can safely be ignored
+	_ = http2.ConfigureTransport(transport)
 	return transport
 }
 

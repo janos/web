@@ -166,6 +166,9 @@ func TestServerServeIndexPage(t *testing.T) {
 	content := "index"
 
 	f, err := os.Create(filepath.Join(dir, "index.html"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -195,6 +198,9 @@ func TestServerRedirectIndexPage(t *testing.T) {
 	content := "index"
 
 	f, err := os.Create(filepath.Join(dir, "index.html"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -229,6 +235,9 @@ func TestServerRedirectTrailingSlashDir(t *testing.T) {
 	content := "index"
 
 	f, err := os.Create(filepath.Join(dir, "index.html"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -264,6 +273,9 @@ func TestServerRedirectTrailingSlashDirFile(t *testing.T) {
 	content := "file content"
 
 	f, err := ioutil.TempFile(dir, "")
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -300,6 +312,9 @@ func TestServerHasher(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -332,6 +347,9 @@ func TestServerHasherRedirect(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -367,6 +385,9 @@ func TestServerHasherWithExtension(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -396,6 +417,9 @@ func TestServerHasherRedirectWithExtension(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -431,6 +455,9 @@ func TestServerHasherNoRegularFile(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -460,6 +487,9 @@ func TestServerHasherRedirectTrailingSlash(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -495,6 +525,9 @@ func TestServerHasherRedirectTrailingSlashCanonicalPath(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -538,6 +571,9 @@ func TestServerInternalServerError(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString("not to be hashed")
 	if err != nil {
 		t.Error(err)
@@ -568,6 +604,9 @@ func TestServerInternalServerErrorCustom(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString("not to be hashed")
 	if err != nil {
 		t.Error(err)
@@ -618,6 +657,9 @@ func TestServerHasherNullHasher(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -648,6 +690,9 @@ func TestServerHashedPath(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "data"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -679,6 +724,9 @@ func TestServerNoHasher(t *testing.T) {
 	content := "file content"
 
 	f, err := os.Create(filepath.Join(dir, "main.js"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -706,6 +754,9 @@ func TestServerHashedPathError(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString("not to be hashed")
 	if err != nil {
 		t.Error(err)
@@ -734,6 +785,9 @@ func TestServerGetHashedPath(t *testing.T) {
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -769,6 +823,9 @@ func TestServerHashedPathFromFilename(t *testing.T) {
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
@@ -833,6 +890,9 @@ func TestServerHashedPathFromFilenameWithFilenames(t *testing.T) {
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
+	if err != nil {
+		t.Error(err)
+	}
 	_, err = f.WriteString(content)
 	if err != nil {
 		t.Error(err)
