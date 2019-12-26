@@ -79,7 +79,7 @@ func TestClientRetryFailure(t *testing.T) {
 	l.Close()
 
 	go func() {
-		time.Sleep(2 * time.Second)
+		time.Sleep(3 * time.Second)
 
 		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 		if err != nil {

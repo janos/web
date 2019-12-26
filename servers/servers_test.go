@@ -17,6 +17,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 var (
@@ -200,6 +201,7 @@ func TestWithRecoverFunc(t *testing.T) {
 	}
 
 	<-m.serving
+	time.Sleep(time.Second)
 
 	mu.Lock()
 	defer mu.Unlock()
