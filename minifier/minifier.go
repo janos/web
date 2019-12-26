@@ -61,10 +61,6 @@ func (w *minifyResponseWriter) Header() http.Header {
 	return w.mw.Header()
 }
 
-func (w *minifyResponseWriter) CloseNotify() <-chan bool {
-	return w.w.(http.CloseNotifier).CloseNotify()
-}
-
 func (w *minifyResponseWriter) Flush() {
 	w.w.(http.Flusher).Flush()
 }
