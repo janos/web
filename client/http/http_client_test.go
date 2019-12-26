@@ -80,16 +80,16 @@ func TestClientRetryFailure(t *testing.T) {
 	go func() {
 		time.Sleep(2 * time.Second)
 
-		l, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 		if err != nil {
-			t.Error(err)
+			panic(err)
 		}
 		defer l.Close()
 		server := http.Server{
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}),
 		}
 		if err := server.Serve(l); err != nil {
-			t.Error(err)
+			panic(err)
 		}
 	}()
 
