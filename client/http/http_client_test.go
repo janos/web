@@ -95,7 +95,7 @@ func TestClientRetryFailure(t *testing.T) {
 
 	r, err := New(&Options{RetryTimeMax: 1 * time.Second}).Get(fmt.Sprintf("http://localhost:%d", port))
 	if err == nil || !strings.Contains(err.Error(), "connection refused") {
-		t.Errorf("expected connection refused error, got %#v", err)
+		t.Errorf("expected connection refused error, got %q", err.Error())
 	}
 	if r != nil {
 		t.Error("unexpected not-nil response")
@@ -103,7 +103,7 @@ func TestClientRetryFailure(t *testing.T) {
 
 	r, err = (&http.Client{Transport: Transport(&Options{RetryTimeMax: 1 * time.Second})}).Get(fmt.Sprintf("http://localhost:%d", port))
 	if err == nil || !strings.Contains(err.Error(), "connection refused") {
-		t.Errorf("expected connection refused error, got %#v", err)
+		t.Errorf("expected connection refused error, got %q", err.Error())
 	}
 	if r != nil {
 		t.Error("unexpected not-nil response")
