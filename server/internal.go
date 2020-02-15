@@ -12,9 +12,10 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"resenje.org/jsonresponse"
-	"resenje.org/web"
+	"resenje.org/jsonhttp"
 	"resenje.org/x/datadump"
+
+	"resenje.org/web"
 )
 
 func newInternalRouter(s *Server) http.Handler {
@@ -56,7 +57,7 @@ func newInternalRouter(s *Server) http.Handler {
 		web.FinalHandler(internalAPIRouter),
 	))
 	internalAPIRouter.Handle("/api/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		jsonresponse.NotFound(w, nil)
+		jsonhttp.NotFound(w, nil)
 	}))
 	internalAPIRouter.Handle("/api/status", http.HandlerFunc(s.statusAPIHandler))
 	if s.maintenanceService != nil {

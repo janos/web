@@ -22,7 +22,7 @@ require (
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 	resenje.org/email v0.1.2
-	resenje.org/jsonresponse v0.1.2
+	resenje.org/jsonhttp v0.2.0
 	resenje.org/logging v0.1.5
 	resenje.org/marshal v0.1.1
 	resenje.org/recovery v0.1.1

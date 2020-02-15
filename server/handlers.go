@@ -12,7 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"resenje.org/jsonresponse"
+	"resenje.org/jsonhttp"
+
 	"resenje.org/web"
 	"resenje.org/web/recovery"
 )
@@ -74,7 +75,7 @@ type statusResponse struct {
 }
 
 func (s *Server) statusAPIHandler(w http.ResponseWriter, r *http.Request) {
-	jsonresponse.OK(w, statusResponse{
+	jsonhttp.OK(w, statusResponse{
 		Name:    s.name,
 		Version: s.Version(),
 		Uptime:  time.Since(s.startTime).String(),
