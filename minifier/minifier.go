@@ -23,7 +23,8 @@ var minifier = minify.New()
 
 func init() {
 	htmlMinify := &html.Minifier{
-		KeepWhitespace: true,
+		KeepWhitespace:   true,
+		KeepDocumentTags: true,
 	}
 	minifier.AddFunc("text/css", css.Minify)
 	minifier.Add("text/html", htmlMinify)
