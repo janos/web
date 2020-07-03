@@ -18,7 +18,7 @@ import (
 	"resenje.org/web"
 )
 
-func newInternalRouter(s *Server) http.Handler {
+func newInternalRouter(s *Server, setupFunc func(base, api *http.ServeMux)) http.Handler {
 	//
 	// Top level internal router
 	//
@@ -71,6 +71,10 @@ func newInternalRouter(s *Server) http.Handler {
 		s.metricsRegistry,
 		promhttp.HandlerFor(s.metricsRegistry, promhttp.HandlerOpts{}),
 	))
+
+	if setupFunc != nil {
+		setupFunc(internalBaseRouter, internalAPIRouter)
+	}
 
 	//
 	// Final internal handler

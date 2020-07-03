@@ -103,7 +103,7 @@ func New(o Options) (s *Server, err error) {
 		ClientSessionCache: tls.NewLRUClientSessionCache(-1),
 	}
 
-	internalRouter := newInternalRouter(s)
+	internalRouter := newInternalRouter(s, o.SetupInternalRouters)
 	if o.ListenInternal != "" {
 		s.servers.Add("internal HTTP", o.ListenInternal, httpServer.New(
 			internalRouter,
@@ -120,15 +120,16 @@ func New(o Options) (s *Server, err error) {
 
 // Options structure contains optional properties for the Server.
 type Options struct {
-	Name              string
-	Version           string
-	BuildInfo         string
-	ListenInternal    string
-	ListenInternalTLS string
-	InternalTLSCert   string
-	InternalTLSKey    string
-	ACMECertsDir      string
-	ACMECertsEmail    string
+	Name                 string
+	Version              string
+	BuildInfo            string
+	ListenInternal       string
+	ListenInternalTLS    string
+	InternalTLSCert      string
+	InternalTLSKey       string
+	ACMECertsDir         string
+	ACMECertsEmail       string
+	SetupInternalRouters func(base, api *http.ServeMux)
 
 	Logger *logging.Logger
 
