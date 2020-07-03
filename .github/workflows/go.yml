@@ -37,8 +37,10 @@ jobs:
           ${{ runner.OS }}-build-
           ${{ runner.OS }}-
 
-    - name: Set up GolangCI-Lint
-      run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+    - name: Setup GolangCI-Lint
+      run: go get -u github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
+      env:
+        GO111MODULE: on
       working-directory: ~
 
     - name: GolangCI-Lint
