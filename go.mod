@@ -1,25 +1,27 @@
 module resenje.org/web
 
-go 1.14
+go 1.15
 
 require (
-	github.com/golang/mock v1.4.3 // indirect
 	github.com/golang/protobuf v1.4.2
-	github.com/gorilla/handlers v1.4.2
+	github.com/google/go-cmp v0.5.2 // indirect
+	github.com/gorilla/handlers v1.5.0
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lucas-clemente/quic-go v0.17.2
+	github.com/lucas-clemente/quic-go v0.18.0
 	github.com/marten-seemann/qtls v0.10.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/common v0.13.0 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/tdewolff/minify/v2 v2.7.6
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/net v0.0.0-20200625001655-4c5254603344
-	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
+	github.com/tdewolff/minify/v2 v2.9.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/net v0.0.0-20200822124328-c89045814202
+	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect
 	golang.org/x/text v0.3.3 // indirect
-	google.golang.org/genproto v0.0.0-20200702021140-07506425bd67 // indirect
-	google.golang.org/grpc v1.30.0
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
+	google.golang.org/grpc v1.31.1
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
