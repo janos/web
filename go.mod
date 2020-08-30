@@ -8,13 +8,9 @@ require (
 	github.com/gorilla/handlers v1.5.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lucas-clemente/quic-go v0.18.0
-	github.com/marten-seemann/qtls v0.10.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.13.0 // indirect
-	github.com/stretchr/testify v1.6.1 // indirect
-	github.com/tdewolff/minify/v2 v2.9.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/net v0.0.0-20200822124328-c89045814202
 	golang.org/x/sys v0.0.0-20200826173525-f9321e4c35a6 // indirect
@@ -24,11 +20,9 @@ require (
 	google.golang.org/grpc v1.31.1
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 	resenje.org/email v0.1.3
 	resenje.org/jsonhttp v0.2.0
 	resenje.org/logging v0.1.6
-	resenje.org/marshal v0.1.1
 	resenje.org/recovery v0.1.1
 	resenje.org/x v0.2.4
 )
