@@ -13,7 +13,7 @@ import (
 )
 
 // DomainRedirectHandler responds with redirect url based on
-// domain and httpsPort, othervise it executes the handler.
+// domain and httpsPort, otherwise it executes the handler.
 func DomainRedirectHandler(h http.Handler, domain, httpsPort string) http.Handler {
 	if domain == "" && httpsPort == "" {
 		return h
