@@ -35,6 +35,7 @@ jobs:
       uses: golangci/golangci-lint-action@v2
       with:
         version: v1.39
+        args: --timeout 10m
 
     - name: Vet
       if: matrix.os == 'ubuntu-latest'
