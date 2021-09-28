@@ -11,40 +11,8 @@ import (
 	"time"
 
 	"resenje.org/logging"
+	"resenje.org/web"
 )
-
-type responseLogger struct {
-	w      http.ResponseWriter
-	status int
-	size   int
-}
-
-func (l *responseLogger) Header() http.Header {
-	return l.w.Header()
-}
-
-func (l *responseLogger) Flush() {
-	l.w.(http.Flusher).Flush()
-}
-
-func (l *responseLogger) Push(target string, opts *http.PushOptions) error {
-	return l.w.(http.Pusher).Push(target, opts)
-}
-
-func (l *responseLogger) Write(b []byte) (int, error) {
-	if l.status == 0 {
-		// The status will be StatusOK if WriteHeader has not been called yet
-		l.status = http.StatusOK
-	}
-	size, err := l.w.Write(b)
-	l.size += size
-	return size, err
-}
-
-func (l *responseLogger) WriteHeader(s int) {
-	l.w.WriteHeader(s)
-	l.status = s
-}
 
 // NewHandler returns a handler that logs HTTP requests.
 // It logs information about remote address, X-Forwarded-For or X-Real-Ip,
@@ -54,7 +22,7 @@ func (l *responseLogger) WriteHeader(s int) {
 func NewHandler(h http.Handler, logger *logging.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		rl := &responseLogger{w, 0, 0}
+		rl := web.NewResponseStatusRecorder(w)
 		h.ServeHTTP(rl, r)
 		referrer := r.Referer()
 		if referrer == "" {
@@ -77,19 +45,20 @@ func NewHandler(h http.Handler, logger *logging.Logger) http.Handler {
 		if len(ips) > 0 {
 			xips = strings.Join(ips, ", ")
 		}
+		status := rl.Status()
 		var level logging.Level
 		switch {
-		case rl.status >= 500:
+		case status >= 500:
 			level = logging.ERROR
-		case rl.status >= 400:
+		case status >= 400:
 			level = logging.WARNING
-		case rl.status >= 300:
+		case status >= 300:
 			level = logging.INFO
-		case rl.status >= 200:
+		case status >= 200:
 			level = logging.INFO
 		default:
 			level = logging.DEBUG
 		}
-		logger.Logf(level, "%s \"%s\" \"%v %s %v\" %d %d %f \"%s\" \"%s\"", r.RemoteAddr, xips, r.Method, r.RequestURI, r.Proto, rl.status, rl.size, time.Since(startTime).Seconds(), referrer, userAgent)
+		logger.Logf(level, "%s \"%s\" \"%v %s %v\" %d %d %f \"%s\" \"%s\"", r.RemoteAddr, xips, r.Method, r.RequestURI, r.Proto, status, rl.ResponseBodySize(), time.Since(startTime).Seconds(), referrer, userAgent)
 	})
 }

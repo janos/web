@@ -29,9 +29,10 @@ func TestAccessLog(t *testing.T) {
 		pattern    *regexp.Regexp
 	}{
 		{
-			name:    "GET",
-			request: httptest.NewRequest("", "/", nil),
-			pattern: regexp.MustCompile(`^INFO 192.0.2.1:1234 "-" "GET / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
+			name:       "GET",
+			request:    httptest.NewRequest("", "/", nil),
+			statusCode: http.StatusOK,
+			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "-" "GET / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
 		},
 		{
 			name:       "POST",
@@ -112,5 +113,4 @@ func TestAccessLog(t *testing.T) {
 			}
 		})
 	}
-
 }
