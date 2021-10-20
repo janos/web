@@ -20,7 +20,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/crypto/acme/autocert"
 	"resenje.org/email"
-	"resenje.org/logging"
 	"resenje.org/recovery"
 	"resenje.org/web/maintenance"
 	"resenje.org/web/servers"
@@ -43,7 +42,7 @@ type Server struct {
 	buildInfo      string
 	acmeCertsDir   string
 	acmeCertsEmail string
-	logger         *logging.Logger
+	logger         servers.Logger
 
 	dataDumpServices   map[string]datadump.Interface
 	emailService       *email.Service
@@ -131,7 +130,7 @@ type Options struct {
 	ACMECertsEmail       string
 	SetupInternalRouters func(base, api *http.ServeMux)
 
-	Logger *logging.Logger
+	Logger servers.Logger
 
 	EmailService       *email.Service
 	RecoveryService    *recovery.Service
