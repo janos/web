@@ -5,7 +5,13 @@
 
 package web
 
-import "net/http"
+import (
+	"bufio"
+	"errors"
+	"io"
+	"net"
+	"net/http"
+)
 
 // ResponseStatusRecorder implements http.ResponseWriter that keeps tack of HTTP
 // response status code and written body size in bytes.
@@ -55,4 +61,36 @@ func (r *ResponseStatusRecorder) Status() int {
 // ResponseBodySize returns the number of bytes that are written as the response body.
 func (r *ResponseStatusRecorder) ResponseBodySize() int {
 	return r.size
+}
+
+func (r *ResponseStatusRecorder) Flush() {
+	f, ok := r.ResponseWriter.(http.Flusher)
+	if !ok {
+		return
+	}
+	f.Flush()
+}
+
+func (r *ResponseStatusRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := r.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("response writer does not implement http.Hijacker")
+	}
+	return h.Hijack()
+}
+
+func (r *ResponseStatusRecorder) ReadFrom(src io.Reader) (int64, error) {
+	rf, ok := r.ResponseWriter.(io.ReaderFrom)
+	if !ok {
+		return 0, errors.New("response writer does not implement io.ReaderFrom")
+	}
+	return rf.ReadFrom(src)
+}
+
+func (r *ResponseStatusRecorder) Push(target string, opts *http.PushOptions) error {
+	p, ok := r.ResponseWriter.(http.Pusher)
+	if !ok {
+		return errors.New("response writer does not implement http.Pusher")
+	}
+	return p.Push(target, opts)
 }
