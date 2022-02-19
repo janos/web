@@ -20,7 +20,7 @@ type Handler struct {
 	panicBody            string
 	panicContentType     string
 	panicResponseHandler http.Handler
-	logf                 func(format string, a ...interface{})
+	logf                 func(format string, a ...any)
 	notifier             Notifier
 }
 
@@ -52,7 +52,7 @@ func WithPanicResponseHandler(h http.Handler) Option {
 
 // WithLogFunc sets the function that will perform message logging.
 // Default is log.Printf.
-func WithLogFunc(logf func(format string, a ...interface{})) Option {
+func WithLogFunc(logf func(format string, a ...any)) Option {
 	return func(o *Handler) { o.logf = logf }
 }
 

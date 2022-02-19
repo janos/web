@@ -15,8 +15,8 @@ import (
 
 // NewContextFunc creates a new function that can be used to store
 // and access arbitrary data by keys.
-func NewContextFunc(m map[string]interface{}) func(string) interface{} {
-	return func(key string) interface{} {
+func NewContextFunc(m map[string]any) func(string) any {
+	return func(key string) any {
 		if value, ok := m[key]; ok {
 			return value
 		}
@@ -88,17 +88,13 @@ func htmlBrFunc(text string) string {
 	return strings.ReplaceAll(text, "\n", "<br>")
 }
 
-func mapFunc(values ...interface{}) (map[string]interface{}, error) {
+func mapFunc(values ...string) (map[string]string, error) {
 	if len(values)%2 != 0 {
 		return nil, errors.New("invalid map call")
 	}
-	m := make(map[string]interface{}, len(values)/2)
+	m := make(map[string]string, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
-		key, ok := values[i].(string)
-		if !ok {
-			return nil, errors.New("map keys must be strings")
-		}
-		m[key] = values[i+1]
+		m[values[i]] = values[i+1]
 	}
 	return m, nil
 }

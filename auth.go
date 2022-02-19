@@ -27,7 +27,7 @@ const basicAuthScheme string = "Basic "
 //  - public/secret API key auth handler with Basic auth support - all three are set
 // By setting AuthorizedNetworks, this handler can authorize requests based only on
 // RemoteAddr address.
-type AuthHandler struct {
+type AuthHandler[Entity any] struct {
 	KeyHeaderName    string
 	SecretHeaderName string
 	BasicAuthRealm   string
@@ -41,12 +41,12 @@ type AuthHandler struct {
 
 	// AuthFunc validates credentials. It should return if credentials are valid,
 	// and optional entity which will be passed to PostAuthFunc.
-	AuthFunc func(r *http.Request, key, secret string) (valid bool, entity interface{}, err error)
+	AuthFunc func(r *http.Request, key, secret string) (valid bool, entity Entity, err error)
 	// PostAuthFunc is a hook to log, set request context or preform any other action
 	// after credentials check. If not nil, it is always called, regardless of other
 	// configurations. It provides access to response writer, request and returned
 	// information from the AuthFunc: valid and entity.
-	PostAuthFunc func(w http.ResponseWriter, r *http.Request, valid bool, entity interface{}) (rr *http.Request, err error)
+	PostAuthFunc func(w http.ResponseWriter, r *http.Request, valid bool, entity Entity) (rr *http.Request, err error)
 
 	// AuthorizeAll will bypass all methods and authorize all requests.
 	AuthorizeAll bool
@@ -61,7 +61,7 @@ type AuthHandler struct {
 }
 
 // ServeHTTP serves an HTTP response for a request.
-func (h AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h AuthHandler[Entity]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	valid, entity, err := h.authenticate(r)
 	if err != nil {
 		h.error(w, r, err)
@@ -110,7 +110,7 @@ func getRequestIPs(r *http.Request) (ips []net.IP) {
 	return
 }
 
-func (h AuthHandler) authenticate(r *http.Request) (valid bool, entity interface{}, err error) {
+func (h AuthHandler[Entity]) authenticate(r *http.Request) (valid bool, entity Entity, err error) {
 	if h.AuthorizeAll {
 		valid = true
 		return
@@ -186,14 +186,14 @@ func (h AuthHandler) authenticate(r *http.Request) (valid bool, entity interface
 	return
 }
 
-func (h AuthHandler) error(w http.ResponseWriter, r *http.Request, err error) {
+func (h AuthHandler[Entity]) error(w http.ResponseWriter, r *http.Request, err error) {
 	if h.ErrorHandler == nil {
 		panic(err)
 	}
 	h.ErrorHandler(w, r, err)
 }
 
-func (h AuthHandler) unauthorized(w http.ResponseWriter, r *http.Request) {
+func (h AuthHandler[Entity]) unauthorized(w http.ResponseWriter, r *http.Request) {
 	if h.BasicAuthRealm != "" {
 		w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=%q", h.BasicAuthRealm))
 	}

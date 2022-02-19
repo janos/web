@@ -16,7 +16,9 @@ import (
 	"resenje.org/web/servers/grpc/internal/hello"
 )
 
-type server struct{}
+type server struct {
+	hello.UnimplementedGreeterServer
+}
 
 func (s *server) Greet(ctx context.Context, in *hello.GreetRequest) (*hello.GreetResponse, error) {
 	return &hello.GreetResponse{Message: "Hello, " + in.Name + "!"}, nil

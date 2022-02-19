@@ -80,7 +80,7 @@ func TestHandlerPanicResponseHandler(t *testing.T) {
 
 func TestHandlerLogFunc(t *testing.T) {
 	rec := ""
-	logFunc := func(format string, a ...interface{}) {
+	logFunc := func(format string, a ...any) {
 		rec = fmt.Sprintf(format, a...)
 	}
 

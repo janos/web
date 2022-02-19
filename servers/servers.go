@@ -15,19 +15,19 @@ import (
 
 // Logger defines methods required for logging.
 type Logger interface {
-	Infof(format string, a ...interface{})
-	Errorf(format string, a ...interface{})
+	Infof(format string, a ...any)
+	Errorf(format string, a ...any)
 }
 
 // stdLogger is a simple implementation of Logger interface
 // that uses log package for logging messages.
 type stdLogger struct{}
 
-func (l stdLogger) Infof(format string, a ...interface{}) {
+func (l stdLogger) Infof(format string, a ...any) {
 	log.Printf("INFO "+format, a...)
 }
 
-func (l stdLogger) Errorf(format string, a ...interface{}) {
+func (l stdLogger) Errorf(format string, a ...any) {
 	log.Printf("ERROR "+format, a...)
 }
 

@@ -49,7 +49,7 @@ type Options struct {
 	functions        template.FuncMap
 	delimOpen        string
 	delimClose       string
-	logf             func(format string, a ...interface{})
+	logf             func(format string, a ...any)
 }
 
 // Option sets parameters used in New function.
@@ -122,7 +122,7 @@ func WithTemplatesFromStrings(ts map[string][]string) Option {
 }
 
 // WithFunction adds a function to templates.
-func WithFunction(name string, fn interface{}) Option {
+func WithFunction(name string, fn any) Option {
 	return func(o *Options) { o.functions[name] = fn }
 }
 
@@ -145,7 +145,7 @@ func WithDelims(open, close string) Option {
 
 // WithLogFunc sets the function that will perform message logging.
 // Default is log.Printf.
-func WithLogFunc(logf func(format string, a ...interface{})) Option {
+func WithLogFunc(logf func(format string, a ...any)) Option {
 	return func(o *Options) { o.logf = logf }
 }
 
@@ -154,7 +154,7 @@ type Templates struct {
 	templates   map[string]*template.Template
 	parseFiles  func(name string) (*template.Template, error)
 	contentType string
-	logf        func(format string, a ...interface{})
+	logf        func(format string, a ...any)
 }
 
 // New creates a new instance of Templates and parses
@@ -223,7 +223,7 @@ func New(opts ...Option) (t *Templates, err error) {
 // RespondTemplateWithStatus executes a named template with provided data into buffer,
 // then writes the the status and body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
-func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templateName string, data interface{}, status int) {
+func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templateName string, data any, status int) {
 	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
 	if err := tpl.ExecuteTemplate(&buf, templateName, data); err != nil {
@@ -243,7 +243,7 @@ func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templa
 // RespondWithStatus executes a template with provided data into buffer,
 // then writes the the status and body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
-func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data interface{}, status int) {
+func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data any, status int) {
 	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
 	if err := tpl.Execute(&buf, data); err != nil {
@@ -263,19 +263,19 @@ func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data in
 // RespondTemplate executes a named template with provided data into buffer,
 // then writes the the body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
-func (t Templates) RespondTemplate(w http.ResponseWriter, name, templateName string, data interface{}) {
+func (t Templates) RespondTemplate(w http.ResponseWriter, name, templateName string, data any) {
 	t.RespondTemplateWithStatus(w, name, templateName, data, 0)
 }
 
 // Respond executes template with provided data into buffer,
 // then writes the the body to the response writer.
 // A panic will be raised if the template does not exist or fails to execute.
-func (t Templates) Respond(w http.ResponseWriter, name string, data interface{}) {
+func (t Templates) Respond(w http.ResponseWriter, name string, data any) {
 	t.RespondWithStatus(w, name, data, 0)
 }
 
 // RenderTemplate executes a named template and returns the string.
-func (t Templates) RenderTemplate(name, templateName string, data interface{}) (s string, err error) {
+func (t Templates) RenderTemplate(name, templateName string, data any) (s string, err error) {
 	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
 	if err := tpl.ExecuteTemplate(&buf, templateName, data); err != nil {
@@ -285,7 +285,7 @@ func (t Templates) RenderTemplate(name, templateName string, data interface{}) (
 }
 
 // Render executes a template and returns the string.
-func (t Templates) Render(name string, data interface{}) (s string, err error) {
+func (t Templates) Render(name string, data any) (s string, err error) {
 	tpl := t.mustTemplate(name)
 	buf := bytes.Buffer{}
 	if err := tpl.Execute(&buf, data); err != nil {

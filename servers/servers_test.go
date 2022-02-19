@@ -122,11 +122,11 @@ type logRecorder struct {
 	buf bytes.Buffer
 }
 
-func (l *logRecorder) Infof(format string, a ...interface{}) {
+func (l *logRecorder) Infof(format string, a ...any) {
 	fmt.Fprintf(&l.buf, "INFO "+format, a...)
 }
 
-func (l *logRecorder) Errorf(format string, a ...interface{}) {
+func (l *logRecorder) Errorf(format string, a ...any) {
 	fmt.Fprintf(&l.buf, "ERROR "+format, a...)
 }
 
