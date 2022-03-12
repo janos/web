@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"golang.org/x/crypto/acme/autocert"
 	"resenje.org/email"
 	"resenje.org/recovery"
@@ -83,8 +84,8 @@ func New(o Options) (s *Server, err error) {
 
 	// register standard metrics
 	s.metricsRegistry.MustRegister(
-		prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}),
-		prometheus.NewGoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+		collectors.NewGoCollector(),
 	)
 
 	var certificates []tls.Certificate
