@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/lucas-clemente/quic-go v0.25.0
 	github.com/prometheus/client_golang v1.12.1
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.27.1
@@ -41,7 +41,7 @@ require (
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/sys v0.0.0-20220315180522-27bbf83dae87 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
