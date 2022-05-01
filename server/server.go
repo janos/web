@@ -89,8 +89,8 @@ func New(o Options) (s *Server, err error) {
 	)
 
 	var certificates []tls.Certificate
-	if o.InternalTLSKey != "" && o.InternalTLSCert != "" {
-		cert, err := tls.LoadX509KeyPair(o.InternalTLSCert, o.InternalTLSKey)
+	if o.InstrumentationTLSKey != "" && o.InstrumentationTLSCert != "" {
+		cert, err := tls.LoadX509KeyPair(o.InstrumentationTLSCert, o.InstrumentationTLSKey)
 		if err != nil {
 			return nil, fmt.Errorf("load certificate: %v", err)
 		}
@@ -103,15 +103,15 @@ func New(o Options) (s *Server, err error) {
 		ClientSessionCache: tls.NewLRUClientSessionCache(-1),
 	}
 
-	internalRouter := newInternalRouter(s, o.SetupInternalRouters)
-	if o.ListenInternal != "" {
-		s.servers.Add("internal HTTP", o.ListenInternal, httpServer.New(
-			internalRouter,
+	instrumentationRouter := newInstrumentationRouter(s, o.SetupInstrumentationRouters)
+	if o.ListenInstrumentation != "" {
+		s.servers.Add("instrumentation HTTP", o.ListenInstrumentation, httpServer.New(
+			instrumentationRouter,
 		))
 	}
-	if o.ListenInternalTLS != "" {
-		s.servers.Add("internal TLS HTTP", o.ListenInternalTLS, httpServer.New(
-			internalRouter,
+	if o.ListenInstrumentationTLS != "" {
+		s.servers.Add("instrumentation TLS HTTP", o.ListenInstrumentationTLS, httpServer.New(
+			instrumentationRouter,
 			httpServer.WithTLSConfig(tlsConfig),
 		))
 	}
@@ -120,16 +120,16 @@ func New(o Options) (s *Server, err error) {
 
 // Options structure contains optional properties for the Server.
 type Options struct {
-	Name                 string
-	Version              string
-	BuildInfo            string
-	ListenInternal       string
-	ListenInternalTLS    string
-	InternalTLSCert      string
-	InternalTLSKey       string
-	ACMECertsDir         string
-	ACMECertsEmail       string
-	SetupInternalRouters func(base, api *http.ServeMux)
+	Name                        string
+	Version                     string
+	BuildInfo                   string
+	ListenInstrumentation       string
+	ListenInstrumentationTLS    string
+	InstrumentationTLSCert      string
+	InstrumentationTLSKey       string
+	ACMECertsDir                string
+	ACMECertsEmail              string
+	SetupInstrumentationRouters func(base, api *http.ServeMux)
 
 	Logger servers.Logger
 
@@ -332,13 +332,13 @@ func (s *Server) Shutdown(ctx context.Context) {
 }
 
 // WithMetrics registers prometheus collector to be exposed
-// on internal handler /metrics request.
+// on instrumentation handler /metrics request.
 func (s *Server) WithMetrics(cs ...prometheus.Collector) {
 	s.metricsRegistry.MustRegister(cs...)
 }
 
 // WithDataDumpService adds a service with data dump interface
-// to be used on internal handler /data request.
+// to be used on instrumentation handler /data request.
 func (s *Server) WithDataDumpService(name string, service datadump.Interface) {
 	s.dataDumpServices[name] = service
 }
