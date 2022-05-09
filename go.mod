@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/lucas-clemente/quic-go v0.27.0
 	github.com/prometheus/client_golang v1.12.1
-	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
+	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
@@ -14,7 +14,7 @@ require (
 	resenje.org/jsonhttp v0.2.0
 	resenje.org/logging v0.1.7
 	resenje.org/recovery v0.1.1
-	resenje.org/x v0.4.0
+	resenje.org/x v0.4.1
 )
 
 require (
