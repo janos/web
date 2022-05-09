@@ -672,8 +672,8 @@ resenje.org/logging v0.1.7/go.mod h1:HRMBfynFd/bqNROK2r5JXDtamHQOlZS5VWT0VxpoH2Q
 resenje.org/marshal v0.1.1/go.mod h1:P7Cla6Ju5CFvW4Y8JbRgWX1Hcy4L1w4qcCsyadO7G94=
 resenje.org/recovery v0.1.1 h1:/mXWD5S97BKF2B1/GxRUnWRuX2ZK4/4vSO70vsO1IYc=
 resenje.org/recovery v0.1.1/go.mod h1:3S6aCVKMJEWsSAb61oZTteaiqkIfQPTr1RdiWnRbhME=
-resenje.org/x v0.3.5 h1:uIkam7ZLrbFdsNnzsz/lXjCHv3NFxgihPrLGOHk7Lss=
-resenje.org/x v0.3.5/go.mod h1:nOviUu/3wDZdkiSQg2IhmVCHdxdzEJ+nvIZzftp19w0=
+resenje.org/x v0.4.0 h1:kWNwNrjmlo7eRWV655SEhDSKpr2mVLdQBli8lLtz2dc=
+resenje.org/x v0.4.0/go.mod h1:nOviUu/3wDZdkiSQg2IhmVCHdxdzEJ+nvIZzftp19w0=
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=

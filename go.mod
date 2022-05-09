@@ -14,7 +14,7 @@ require (
 	resenje.org/jsonhttp v0.2.0
 	resenje.org/logging v0.1.7
 	resenje.org/recovery v0.1.1
-	resenje.org/x v0.3.5
+	resenje.org/x v0.4.0
 )
 
 require (

@@ -36,7 +36,7 @@ func newInstrumentationRouter(s *Server, setupFunc func(base, api *http.ServeMux
 	))
 	instrumentationRouter.Handle("/", http.HandlerFunc(textNotFoundHandler))
 	instrumentationRouter.Handle("/status", http.HandlerFunc(s.statusHandler))
-	instrumentationRouter.Handle("/data", datadump.Handler(s.dataDumpServices, s.name+"_"+s.Version(), s.logger))
+	instrumentationRouter.Handle("/data", datadump.Handler(s.dataDumpServices, s.name+"_"+s.Version(), s.logger, true))
 
 	instrumentationRouter.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
 	instrumentationRouter.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
