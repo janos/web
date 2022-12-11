@@ -48,10 +48,8 @@ func New(handler http.Handler, opts ...Option) (s *Server) {
 	}
 	s = &Server{
 		Server: &http3.Server{
-			Server: &http.Server{
-				Handler:   handler,
-				TLSConfig: o.tlsConfig,
-			},
+			Handler:   handler,
+			TLSConfig: o.tlsConfig,
 		},
 	}
 	return
@@ -59,7 +57,7 @@ func New(handler http.Handler, opts ...Option) (s *Server) {
 
 // ServeUDP serves requests over UDP connection.
 func (s *Server) ServeUDP(conn *net.UDPConn) (err error) {
-	s.Server.Server.Addr = conn.LocalAddr().String()
+	s.Server.Addr = conn.LocalAddr().String()
 	return s.Server.Serve(conn)
 }
 

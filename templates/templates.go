@@ -10,9 +10,10 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
+
+	"golang.org/x/exp/slog"
 )
 
 // Error is a common error type that holds
@@ -49,7 +50,7 @@ type Options struct {
 	functions        template.FuncMap
 	delimOpen        string
 	delimClose       string
-	logf             func(format string, a ...any)
+	logger           *slog.Logger
 }
 
 // Option sets parameters used in New function.
@@ -143,10 +144,10 @@ func WithDelims(open, close string) Option {
 	}
 }
 
-// WithLogFunc sets the function that will perform message logging.
-// Default is log.Printf.
-func WithLogFunc(logf func(format string, a ...any)) Option {
-	return func(o *Options) { o.logf = logf }
+// WithLogger sets the function that will perform message logging.
+// Default is slog.Default().
+func WithLogger(l *slog.Logger) Option {
+	return func(o *Options) { o.logger = l }
 }
 
 // Templates structure holds parsed templates.
@@ -154,7 +155,7 @@ type Templates struct {
 	templates   map[string]*template.Template
 	parseFiles  func(name string) (*template.Template, error)
 	contentType string
-	logf        func(format string, a ...any)
+	logger      *slog.Logger
 }
 
 // New creates a new instance of Templates and parses
@@ -173,7 +174,7 @@ func New(opts ...Option) (t *Templates, err error) {
 		functions:    functions,
 		delimOpen:    "{{",
 		delimClose:   "}}",
-		logf:         log.Printf,
+		logger:       slog.Default(),
 	}
 	for _, opt := range opts {
 		opt(o)
@@ -182,7 +183,7 @@ func New(opts ...Option) (t *Templates, err error) {
 	t = &Templates{
 		templates:   map[string]*template.Template{},
 		contentType: o.contentType,
-		logf:        o.logf,
+		logger:      o.logger,
 	}
 	for name, strings := range o.strings {
 		tpl, err := parseStrings(template.New("").Funcs(o.functions).Delims(o.delimOpen, o.delimClose), strings...)
@@ -236,7 +237,7 @@ func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templa
 		w.WriteHeader(status)
 	}
 	if _, err := buf.WriteTo(w); err != nil {
-		t.logf("respond %q template %q: %v", name, templateName, err)
+		t.logger.Debug("templates: respond template with status", "name", name, "template", templateName, "status", status, slog.ErrorKey, err)
 	}
 }
 
@@ -256,7 +257,7 @@ func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data an
 		w.WriteHeader(status)
 	}
 	if _, err := buf.WriteTo(w); err != nil {
-		t.logf("respond %q: %v", name, err)
+		t.logger.Debug("templates: respond with status", "name", name, "status", status, slog.ErrorKey, err)
 	}
 }
 

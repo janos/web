@@ -91,7 +91,7 @@ func (s *Server) statusHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) jsonRecoveryHandler(h http.Handler) http.Handler {
 	return recovery.New(h,
 		recovery.WithLabel(s.Version()),
-		recovery.WithLogFunc(s.logger.Errorf),
+		recovery.WithLogger(s.logger),
 		recovery.WithNotifier(s.emailService),
 		recovery.WithPanicResponse(`{"message":"Internal Server Error","code":500}`, "application/json; charset=utf-8"),
 	)
@@ -101,7 +101,7 @@ func (s *Server) jsonRecoveryHandler(h http.Handler) http.Handler {
 func (s *Server) textRecoveryHandler(h http.Handler) http.Handler {
 	return recovery.New(h,
 		recovery.WithLabel(s.Version()),
-		recovery.WithLogFunc(s.logger.Errorf),
+		recovery.WithLogger(s.logger),
 		recovery.WithNotifier(s.emailService),
 		recovery.WithPanicResponse("Internal Server Error", "text/plain; charset=utf-8"),
 	)

@@ -7,37 +7,20 @@ package maintenance
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"golang.org/x/exp/slog"
 )
 
-// Values for HTTP Contet-Type header.
+// Values for HTTP Content-Type header.
 var (
 	HTMLContentType = "text/html; charset=utf-8"
 	TextContentType = "text/text; charset=utf-8"
 	JSONContentType = "application/json; charset=utf-8"
 )
-
-// Logger defines methods required for logging.
-type Logger interface {
-	Infof(format string, a ...any)
-	Errorf(format string, a ...any)
-}
-
-// stdLogger is a simple implementation of Logger interface
-// that uses log package for logging messages.
-type stdLogger struct{}
-
-func (l stdLogger) Infof(format string, a ...any) {
-	log.Printf("INFO "+format, a...)
-}
-
-func (l stdLogger) Errorf(format string, a ...any) {
-	log.Printf("ERROR "+format, a...)
-}
 
 // Store defines methods that are required to check, set and remove
 // information whether the maintenance is on of off.
@@ -177,7 +160,7 @@ type Service struct {
 	Text Response
 
 	store  Store
-	logger Logger
+	logger *slog.Logger
 }
 
 // Option is a function that sets optional parameters to the Handler.
@@ -188,15 +171,15 @@ type Option func(*Service)
 func WithStore(store Store) Option { return func(o *Service) { o.store = store } }
 
 // WithLogger sets the function that will perform message logging.
-// Default is log.Printf.
-func WithLogger(logger Logger) Option { return func(o *Service) { o.logger = logger } }
+// Default is slog.Default().
+func WithLogger(l *slog.Logger) Option { return func(o *Service) { o.logger = l } }
 
 // New creates a new instance of Handler.
 // The first argument is the handler that will be executed
 // when maintenance mode is off.
 func New(options ...Option) (s *Service) {
 	s = &Service{
-		logger: stdLogger{},
+		logger: slog.Default(),
 	}
 	for _, option := range options {
 		option(s)
@@ -213,7 +196,7 @@ func (s Service) HTMLHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Errorf("maintenance status: %v", err)
+			s.logger.Error("maintenance status", err)
 		}
 		if on || err != nil {
 			if s.HTML.Handler != nil {
@@ -235,7 +218,7 @@ func (s Service) JSONHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Errorf("maintenance status: %v", err)
+			s.logger.Error("maintenance status", err)
 		}
 		if on || err != nil {
 			if s.JSON.Handler != nil {
@@ -257,7 +240,7 @@ func (s Service) TextHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Errorf("maintenance status: %v", err)
+			s.logger.Error("maintenance status", err)
 		}
 		if on || err != nil {
 			if s.Text.Handler != nil {
@@ -283,7 +266,7 @@ func (s Service) Status() (on bool, err error) {
 func (s Service) StatusHandler(w http.ResponseWriter, r *http.Request) {
 	on, err := s.store.Status()
 	if err != nil {
-		s.logger.Errorf("maintenance status: %s", err)
+		s.logger.Error("maintenance status", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
@@ -296,12 +279,12 @@ func (s Service) StatusHandler(w http.ResponseWriter, r *http.Request) {
 func (s Service) OnHandler(w http.ResponseWriter, r *http.Request) {
 	changed, err := s.store.On()
 	if err != nil {
-		s.logger.Errorf("maintenance on: %s", err)
+		s.logger.Error("maintenance on", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
 	if changed {
-		s.logger.Infof("maintenance on")
+		s.logger.Info("maintenance on")
 		jsonCreatedResponse(w)
 		return
 	}
@@ -312,12 +295,12 @@ func (s Service) OnHandler(w http.ResponseWriter, r *http.Request) {
 func (s Service) OffHandler(w http.ResponseWriter, r *http.Request) {
 	changed, err := s.store.Off()
 	if err != nil {
-		s.logger.Errorf("maintenance off: %s", err)
+		s.logger.Error("maintenance off", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
 	if changed {
-		s.logger.Infof("maintenance off")
+		s.logger.Info("maintenance off")
 	}
 	jsonOKResponse(w)
 }

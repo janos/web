@@ -7,9 +7,10 @@ package recovery
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"runtime/debug"
+
+	"golang.org/x/exp/slog"
 )
 
 // Handler implements http.Handler interface that will recover from panic
@@ -20,7 +21,7 @@ type Handler struct {
 	panicBody            string
 	panicContentType     string
 	panicResponseHandler http.Handler
-	logf                 func(format string, a ...any)
+	logger               *slog.Logger
 	notifier             Notifier
 }
 
@@ -50,10 +51,10 @@ func WithPanicResponseHandler(h http.Handler) Option {
 	return func(o *Handler) { o.panicResponseHandler = h }
 }
 
-// WithLogFunc sets the function that will perform message logging.
-// Default is log.Printf.
-func WithLogFunc(logf func(format string, a ...any)) Option {
-	return func(o *Handler) { o.logf = logf }
+// WithLogger sets the function that will perform message logging.
+// Default is slog.Default().
+func WithLogger(l *slog.Logger) Option {
+	return func(o *Handler) { o.logger = l }
 }
 
 // WithNotifier sets the function that takes subject and body
@@ -65,7 +66,7 @@ func WithNotifier(notifier Notifier) Option { return func(o *Handler) { o.notifi
 func New(handler http.Handler, options ...Option) (h *Handler) {
 	h = &Handler{
 		handler: handler,
-		logf:    log.Printf,
+		logger:  slog.Default(),
 	}
 	for _, option := range options {
 		option(h)
@@ -86,13 +87,13 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if h.label != "" {
 				debugMsg = h.label + "\n\n" + debugMsg
 			}
-			h.logf("http recovery handler: %s %s: %s\n%s", r.Method, r.URL.String(), err, debugMsg)
+			h.logger.Log(slog.ErrorLevel, "http recovery handler", "method", r.Method, "url", r.URL.String(), slog.ErrorKey, err, "debug", debugMsg)
 
 			if h.notifier != nil {
 				go func() {
 					defer func() {
 						if err := recover(); err != nil {
-							h.logf("http recovery handler: notify panic: %v", err)
+							h.logger.Log(slog.ErrorLevel, "http recovery handler: notify panic", slog.Any(slog.ErrorKey, err))
 						}
 					}()
 
@@ -106,7 +107,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						),
 						debugMsg,
 					); err != nil {
-						h.logf("http recovery handler: notify: %v", err)
+						h.logger.Log(slog.ErrorLevel, "http recovery handler: notify", slog.Any(slog.ErrorKey, err))
 					}
 				}()
 			}

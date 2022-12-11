@@ -18,6 +18,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"golang.org/x/exp/slog"
 )
 
 var (
@@ -118,22 +120,10 @@ func TestEmptyServer(t *testing.T) {
 	}
 }
 
-type logRecorder struct {
-	buf bytes.Buffer
-}
-
-func (l *logRecorder) Infof(format string, a ...any) {
-	fmt.Fprintf(&l.buf, "INFO "+format, a...)
-}
-
-func (l *logRecorder) Errorf(format string, a ...any) {
-	fmt.Fprintf(&l.buf, "ERROR "+format, a...)
-}
-
 func TestWithLogger(t *testing.T) {
-	logger := &logRecorder{}
+	var buf bytes.Buffer
 
-	s := New(WithLogger(logger))
+	s := New(WithLogger(slog.New(slog.NewJSONHandler(&buf))))
 
 	m := newMockServer()
 
@@ -147,9 +137,9 @@ func TestWithLogger(t *testing.T) {
 
 	addr := listenerAddress(m.ln)
 
-	l := fmt.Sprintf("INFO server listening on %q", addr)
-	if !strings.Contains(logger.buf.String(), l) {
-		t.Errorf("got %q, expected %q", logger.buf.String(), l)
+	l := fmt.Sprintf(",\"level\":\"INFO\",\"msg\":\"listen tcp\",\"label\":\"server\",\"address\":%q}", addr)
+	if !strings.Contains(buf.String(), l) {
+		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Shutdown(context.Background())
@@ -230,21 +220,21 @@ func TestServersShutdown(t *testing.T) {
 
 	addr := listenerAddress(m.ln)
 
-	l := fmt.Sprintf("INFO server listening on %q", addr)
+	l := fmt.Sprintf("INFO listen tcp label=server address=%v", addr)
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Shutdown(context.Background())
 
-	l = "INFO server shutting down"
+	l = "INFO shutting down server name=server"
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Shutdown(context.Background())
 
-	l = "ERROR server shutdown: server already shut down"
+	l = "ERROR shutting down server name=server err=\"server already shut down\""
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
@@ -268,21 +258,21 @@ func TestServersClose(t *testing.T) {
 
 	addr := listenerAddress(m.ln)
 
-	l := fmt.Sprintf("INFO server listening on %q", addr)
+	l := fmt.Sprintf("INFO listen tcp label=server address=%v", addr)
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Close()
 
-	l = "INFO server closing"
+	l = "INFO closing server name=server"
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Close()
 
-	l = "ERROR server close: server already closed"
+	l = "ERROR closing server name=server err=\"server already closed\""
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
@@ -305,14 +295,14 @@ func TestServerName(t *testing.T) {
 
 	addr := listenerAddress(m.ln)
 
-	l := fmt.Sprintf("INFO mocked server listening on %q", addr)
+	l := fmt.Sprintf("INFO listen tcp label=\"mocked server\" address=%v", addr)
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
 
 	s.Shutdown(context.Background())
 
-	l = "INFO mocked server shutting down"
+	l = "INFO shutting down server name=\"mocked server\""
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
@@ -362,7 +352,7 @@ func TestServerFailure(t *testing.T) {
 
 	addr := listenerAddress(m.ln)
 
-	l := fmt.Sprintf("ERROR server serve %q: server failure", addr)
+	l := fmt.Sprintf("INFO listen tcp label=server address=%v", addr)
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}

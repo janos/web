@@ -8,34 +8,17 @@ package servers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"sync"
+
+	"golang.org/x/exp/slog"
 )
-
-// Logger defines methods required for logging.
-type Logger interface {
-	Infof(format string, a ...any)
-	Errorf(format string, a ...any)
-}
-
-// stdLogger is a simple implementation of Logger interface
-// that uses log package for logging messages.
-type stdLogger struct{}
-
-func (l stdLogger) Infof(format string, a ...any) {
-	log.Printf("INFO "+format, a...)
-}
-
-func (l stdLogger) Errorf(format string, a ...any) {
-	log.Printf("ERROR "+format, a...)
-}
 
 // Option is a function that sets optional parameters for Servers.
 type Option func(*Servers)
 
 // WithLogger sets the Logger instance for logging messages.
-func WithLogger(logger Logger) Option { return func(o *Servers) { o.logger = logger } }
+func WithLogger(l *slog.Logger) Option { return func(o *Servers) { o.logger = l } }
 
 // WithRecoverFunc sets a function that will be used to recover
 // from panic inside a goroutune that servers are serving requests.
@@ -47,14 +30,14 @@ func WithRecoverFunc(recover func()) Option { return func(o *Servers) { o.recove
 type Servers struct {
 	servers []*server
 	mu      sync.Mutex
-	logger  Logger
+	logger  *slog.Logger
 	recover func()
 }
 
 // New creates a new instance of Servers with applied options.
 func New(opts ...Option) (s *Servers) {
 	s = &Servers{
-		logger:  stdLogger{},
+		logger:  slog.Default(),
 		recover: func() {},
 	}
 	for _, opt := range opts {
@@ -144,7 +127,7 @@ func (s *Servers) Serve() (err error) {
 						continue
 					}
 					if err := l.Close(); err != nil {
-						s.logger.Errorf("%s tcp listener %q close: %v", srv.label(), srv.address, err)
+						s.logger.Error("close tcp listener", err, "name", srv.label(), "address", srv.address)
 					}
 				}
 				return fmt.Errorf("%s tcp listener %q: %v", srv.label(), srv.address, err)
@@ -172,9 +155,9 @@ func (s *Servers) Serve() (err error) {
 				srv.tcpAddr = ln.Addr().(*net.TCPAddr)
 				s.mu.Unlock()
 
-				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
+				s.logger.Info("listen tcp", "label", srv.label(), "address", srv.tcpAddr.String())
 				if err := tcpSrv.ServeTCP(ln); err != nil {
-					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
+					s.logger.Error("serve tcp", err, "name", srv.label(), "address", srv.tcpAddr.String())
 				}
 			}(srv, lns[i])
 		}
@@ -186,9 +169,9 @@ func (s *Servers) Serve() (err error) {
 				srv.udpAddr = conn.LocalAddr().(*net.UDPAddr)
 				s.mu.Unlock()
 
-				s.logger.Infof("%s listening on %q", srv.label(), srv.tcpAddr.String())
+				s.logger.Info("listen udp", "name", srv.label(), "address", srv.udpAddr.String())
 				if err := udpSrv.ServeUDP(conn); err != nil {
-					s.logger.Errorf("%s serve %q: %v", srv.label(), srv.tcpAddr.String(), err)
+					s.logger.Error("serve udp", err, "name", srv.label(), "address", srv.udpAddr.String(), err)
 				}
 			}(srv, conns[i])
 		}
@@ -237,9 +220,9 @@ func (s *Servers) Close() {
 			defer s.recover()
 			defer wg.Done()
 
-			s.logger.Infof("%s closing", srv.label())
+			s.logger.Info("closing server", "name", srv.label())
 			if err := srv.Close(); err != nil {
-				s.logger.Errorf("%s close: %v", srv.label(), err)
+				s.logger.Error("closing server", err, "name", srv.label())
 			}
 		}(srv)
 	}
@@ -255,9 +238,9 @@ func (s *Servers) Shutdown(ctx context.Context) {
 			defer s.recover()
 			defer wg.Done()
 
-			s.logger.Infof("%s shutting down", srv.label())
+			s.logger.Info("shutting down server", "name", srv.label())
 			if err := srv.Shutdown(ctx); err != nil {
-				s.logger.Errorf("%s shutdown: %v", srv.label(), err)
+				s.logger.Error("shutting down server", err, "name", srv.label())
 			}
 		}(srv)
 	}

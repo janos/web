@@ -3,42 +3,37 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package accesslog
+package logging_test
 
 import (
-	"fmt"
+	"bytes"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
+	"strings"
 	"testing"
 
-	"resenje.org/logging"
+	"golang.org/x/exp/slog"
+	"resenje.org/web/logging"
 )
-
-type Formatter struct{}
-
-func (formatter *Formatter) Format(record *logging.Record) string {
-	return fmt.Sprintf("%s %s", record.Level, record.Message)
-}
 
 func TestAccessLog(t *testing.T) {
 	for _, tc := range []struct {
 		name       string
 		request    *http.Request
 		statusCode int
-		pattern    *regexp.Regexp
+		pattern    string
 	}{
 		{
 			name:       "GET",
 			request:    httptest.NewRequest("", "/", nil),
 			statusCode: http.StatusOK,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "-" "GET / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips=192.0.2.1 method=GET uri=/ proto=HTTP/1.1 status=200 "response size"=9 duration=`,
 		},
 		{
 			name:       "POST",
 			request:    httptest.NewRequest("POST", "/", nil),
 			statusCode: http.StatusOK,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "-" "POST / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips=192.0.2.1 method=POST uri=/ proto=HTTP/1.1 status=200 "response size"=9 duration=`,
 		},
 		{
 			name: "XForwardedFor",
@@ -48,7 +43,7 @@ func TestAccessLog(t *testing.T) {
 				return r
 			}(),
 			statusCode: http.StatusOK,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "1.1.1.1, 1.2.2.2" "POST / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips="192.0.2.1, 1.1.1.1, 1.2.2.2" method=POST uri=/ proto=HTTP/1.1 status=200 "response size"=9 duration=`,
 		},
 		{
 			name: "XRealIp",
@@ -58,7 +53,7 @@ func TestAccessLog(t *testing.T) {
 				return r
 			}(),
 			statusCode: http.StatusOK,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "1.2.3.3" "POST / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips="192.0.2.1, 1.2.3.3" method=POST uri=/ proto=HTTP/1.1 status=200 "response size"=9 duration=`,
 		},
 		{
 			name: "XForwardedForAndXRealIp",
@@ -69,47 +64,40 @@ func TestAccessLog(t *testing.T) {
 				return r
 			}(),
 			statusCode: http.StatusOK,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "1.1.1.1, 1.2.2.2, 1.2.3.3" "POST / HTTP/1.1" 200 9 0.\d{6} "-" "-"$`),
-		},
-		{
-			name:       "100",
-			request:    httptest.NewRequest("POST", "/", nil),
-			statusCode: 100,
-			pattern:    regexp.MustCompile(`^DEBUG 192.0.2.1:1234 "-" "POST / HTTP/1.1" 100 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips="192.0.2.1, 1.1.1.1, 1.2.2.2, 1.2.3.3" method=POST uri=/ proto=HTTP/1.1 status=200 "response size"=9 duration=`,
 		},
 		{
 			name:       "300",
 			request:    httptest.NewRequest("POST", "/", nil),
 			statusCode: 300,
-			pattern:    regexp.MustCompile(`^INFO 192.0.2.1:1234 "-" "POST / HTTP/1.1" 300 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=INFO msg=access "remote address"=192.0.2.1:1234 ips=192.0.2.1 method=POST uri=/ proto=HTTP/1.1 status=300 "response size"=9 duration=`,
 		},
 		{
 			name:       "400",
 			request:    httptest.NewRequest("POST", "/", nil),
 			statusCode: 400,
-			pattern:    regexp.MustCompile(`^WARNING 192.0.2.1:1234 "-" "POST / HTTP/1.1" 400 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=WARN msg=access "remote address"=192.0.2.1:1234 ips=192.0.2.1 method=POST uri=/ proto=HTTP/1.1 status=400 "response size"=9 duration=`,
 		},
 		{
 			name:       "500",
 			request:    httptest.NewRequest("POST", "/", nil),
 			statusCode: 500,
-			pattern:    regexp.MustCompile(`^ERROR 192.0.2.1:1234 "-" "POST / HTTP/1.1" 500 9 0.\d{6} "-" "-"$`),
+			pattern:    `level=ERROR msg=access "remote address"=192.0.2.1:1234 ips=192.0.2.1 method=POST uri=/ proto=HTTP/1.1 status=500 "response size"=9 duration=`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 
-			logHander := &logging.MemoryHandler{Formatter: &Formatter{}, Level: logging.DEBUG}
-			NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var buf bytes.Buffer
+
+			logging.NewAccessLogHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tc.statusCode)
 				_, _ = w.Write([]byte("test data"))
-			}), logging.NewLogger("test", logging.DEBUG, []logging.Handler{logHander}, 0)).ServeHTTP(w, tc.request)
+			}), slog.New(slog.NewTextHandler(&buf)), nil).ServeHTTP(w, tc.request)
 
-			logging.WaitForAllUnprocessedRecords()
-
-			got := logHander.Messages[0]
-			if !tc.pattern.MatchString(got) {
-				t.Errorf("%s did not match pattern", got)
+			got := buf.String()
+			if !strings.Contains(got, tc.pattern) {
+				t.Errorf("got %v, want %v", got, tc.pattern)
 			}
 		})
 	}

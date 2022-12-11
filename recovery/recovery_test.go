@@ -7,13 +7,14 @@ package recovery
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"golang.org/x/exp/slog"
 )
 
 var (
@@ -78,16 +79,14 @@ func TestHandlerPanicResponseHandler(t *testing.T) {
 	}
 }
 
-func TestHandlerLogFunc(t *testing.T) {
-	rec := ""
-	logFunc := func(format string, a ...any) {
-		rec = fmt.Sprintf(format, a...)
-	}
+func TestHandlerLogger(t *testing.T) {
+	var buf bytes.Buffer
 
-	New(panicHandler, WithLogFunc(logFunc)).ServeHTTP(httptest.NewRecorder(), req)
+	New(panicHandler, WithLogger(slog.New(slog.NewTextHandler(&buf)))).ServeHTTP(httptest.NewRecorder(), req)
 
-	if !strings.Contains(rec, "http recovery handler: GET /:") {
-		t.Errorf("got %q, expected %q", rec, "http recovery handler: GET /:")
+	want := "level=ERROR msg=\"http recovery handler\" method=GET url=/ err=\"HTTP utils panic!\" debug="
+	if !strings.Contains(buf.String(), want) {
+		t.Errorf("got %q, expected %q", buf.String(), want)
 	}
 }
 
