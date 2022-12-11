@@ -12,19 +12,20 @@ import (
 )
 
 // GetRequestIPs returns all possible IPs found in HTTP request.
-func GetRequestIPs(r *http.Request) string {
+func GetRequestIPs(r *http.Request, realIPHeaders ...string) string {
+	if realIPHeaders == nil {
+		realIPHeaders = []string{"X-Forwarded-For", "X-Real-Ip"}
+	}
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		ip = r.RemoteAddr
 	}
 	ips := []string{ip}
-	xfr := r.Header.Get("X-Forwarded-For")
-	if xfr != "" {
-		ips = append(ips, xfr)
-	}
-	xri := r.Header.Get("X-Real-Ip")
-	if xri != "" {
-		ips = append(ips, xri)
+	for _, key := range realIPHeaders {
+		v := r.Header.Get(key)
+		if v != "" {
+			ips = append(ips, v)
+		}
 	}
 	return strings.Join(ips, ", ")
 }
