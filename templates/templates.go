@@ -9,8 +9,8 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"golang.org/x/exp/slog"
@@ -31,7 +31,7 @@ func (e *Error) Error() string {
 }
 
 // FileReadFunc returns the content of file referenced
-// by filename. It hes the same signature as ioutil.ReadFile
+// by filename. It hes the same signature as os.ReadFile
 // function.
 type FileReadFunc func(filename string) ([]byte, error)
 
@@ -169,7 +169,7 @@ func New(opts ...Option) (t *Templates, err error) {
 		fileFindFunc: func(f string) string {
 			return f
 		},
-		fileReadFunc: ioutil.ReadFile,
+		fileReadFunc: os.ReadFile,
 		files:        map[string][]string{},
 		functions:    functions,
 		delimOpen:    "{{",

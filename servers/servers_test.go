@@ -10,7 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"strconv"
@@ -169,7 +169,7 @@ func (s *panicServer) Shutdown(ctx context.Context) error {
 }
 
 func TestWithRecoverFunc(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	mu := &sync.Mutex{}
 	recovered := false

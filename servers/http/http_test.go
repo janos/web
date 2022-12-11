@@ -8,7 +8,7 @@ package httpServer
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
@@ -42,7 +42,7 @@ func TestServer(t *testing.T) {
 	}
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +117,7 @@ viBngkOY/zwTS9mYvM8ixsj16b2WWzajtjhBtihs+tur
 	}
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		t.Fatal(err)
 	}

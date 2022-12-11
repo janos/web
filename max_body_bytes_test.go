@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -34,7 +33,7 @@ func TestMaxBodyBytesHandler_Pass(t *testing.T) {
 func TestMaxBodyBytesHandler_Block(t *testing.T) {
 	h := MaxBodyBytesHandler{
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, err := io.Copy(ioutil.Discard, r.Body); err != nil {
+			if _, err := io.Copy(io.Discard, r.Body); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte(err.Error()))
 			}
@@ -50,7 +49,7 @@ func TestMaxBodyBytesHandler_Block(t *testing.T) {
 
 	h.ServeHTTP(w, r)
 
-	b, err := ioutil.ReadAll(w.Result().Body)
+	b, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Error(err)
 	}
@@ -68,7 +67,7 @@ func TestMaxBodyBytesHandler_Block(t *testing.T) {
 func TestMaxBodyBytesHandler_PanicError(t *testing.T) {
 	h := MaxBodyBytesHandler{
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, err := io.Copy(ioutil.Discard, r.Body); err != nil {
+			if _, err := io.Copy(io.Discard, r.Body); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte(err.Error()))
 			}
@@ -96,7 +95,7 @@ func TestMaxBodyBytesHandler_CustomError(t *testing.T) {
 	var e error
 	h := MaxBodyBytesHandler{
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, err := io.Copy(ioutil.Discard, r.Body); err != nil {
+			if _, err := io.Copy(io.Discard, r.Body); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte(err.Error()))
 			}

@@ -6,24 +6,23 @@
 package web
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
 func TestNewStaticFilesHandler(t *testing.T) {
-	dir, err := ioutil.TempDir("", "new-static-files-handler")
-	if err != nil {
-		t.Error(err)
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping on windows")
 	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
-	f, err := ioutil.TempFile(dir, "")
+	f, err := os.CreateTemp(dir, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,11 +47,7 @@ func TestNewStaticFilesHandler(t *testing.T) {
 }
 
 func TestNewStaticFilesHandlerMissingFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "new-static-files-handler")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	called := false
 

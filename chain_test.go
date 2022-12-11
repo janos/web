@@ -6,7 +6,7 @@
 package web
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -44,7 +44,7 @@ func TestChain(t *testing.T) {
 	w := httptest.NewRecorder()
 	ChainHandlers(handlers...).ServeHTTP(w, r)
 
-	b, err := ioutil.ReadAll(w.Result().Body)
+	b, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Error(err)
 	}
@@ -72,7 +72,7 @@ func TestFinalHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 	ChainHandlers(handlers...).ServeHTTP(w, r)
 
-	b, err := ioutil.ReadAll(w.Result().Body)
+	b, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Error(err)
 	}
@@ -100,7 +100,7 @@ func TestFinalHandlerFunc(t *testing.T) {
 	w := httptest.NewRecorder()
 	ChainHandlers(handlers...).ServeHTTP(w, r)
 
-	b, err := ioutil.ReadAll(w.Result().Body)
+	b, err := io.ReadAll(w.Result().Body)
 	if err != nil {
 		t.Error(err)
 	}

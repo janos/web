@@ -7,7 +7,7 @@ package recovery
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -53,7 +53,7 @@ func TestHandlerLabel(t *testing.T) {
 }
 
 func TestHandlerResponse(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	responseBody := "Test recovery handler!"
 	recovery := New(panicHandler, WithPanicResponse(responseBody, ""))
@@ -66,7 +66,7 @@ func TestHandlerResponse(t *testing.T) {
 }
 
 func TestHandlerPanicResponseHandler(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	recovery := New(panicHandler, WithPanicResponseHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusTeapot)
@@ -91,7 +91,7 @@ func TestHandlerLogger(t *testing.T) {
 }
 
 func TestHandlerNotifier(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	subject := ""
 	body := ""

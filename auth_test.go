@@ -8,7 +8,7 @@ package web
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -503,7 +503,7 @@ func TestAuthHandler(t *testing.T) {
 				t.Errorf("expected status code %d, got %d", tc.statusCode, w.Result().StatusCode)
 			}
 
-			body, err := ioutil.ReadAll(w.Result().Body)
+			body, err := io.ReadAll(w.Result().Body)
 			if err != nil {
 				t.Error(err)
 			}

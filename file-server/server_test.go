@@ -7,7 +7,6 @@ package fileServer
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -16,15 +15,11 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
-	f, err := ioutil.TempFile(dir, "")
+	f, err := os.CreateTemp(dir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,15 +42,11 @@ func TestServer(t *testing.T) {
 }
 
 func TestServerAltDir(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
-	f, err := ioutil.TempFile(dir, "")
+	f, err := os.CreateTemp(dir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +57,7 @@ func TestServerAltDir(t *testing.T) {
 	_, fn := filepath.Split(f.Name())
 	f.Close()
 
-	altDir, err := ioutil.TempDir("", "file-server-test-alt")
+	altDir, err := os.MkdirTemp("", "file-server-test-alt")
 	if err != nil {
 		t.Error(err)
 	}
@@ -74,7 +65,7 @@ func TestServerAltDir(t *testing.T) {
 
 	content = "file alt content"
 
-	err = ioutil.WriteFile(filepath.Join(altDir, fn), []byte(content), 0666)
+	err = os.WriteFile(filepath.Join(altDir, fn), []byte(content), 0666)
 	if err != nil {
 		t.Error(err)
 	}
@@ -93,11 +84,7 @@ func TestServerAltDir(t *testing.T) {
 }
 
 func TestServerFileNotFound(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	r := httptest.NewRequest("", "/assets/missing-file", nil)
 	w := httptest.NewRecorder()
@@ -111,11 +98,7 @@ func TestServerFileNotFound(t *testing.T) {
 }
 
 func TestServerFileNotFoundCustom(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	r := httptest.NewRequest("", "/assets/missing-file", nil)
 	w := httptest.NewRecorder()
@@ -139,11 +122,7 @@ func TestServerFileNotFoundCustom(t *testing.T) {
 }
 
 func TestServerDirNotFound(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	r := httptest.NewRequest("", "/assets", nil)
 	w := httptest.NewRecorder()
@@ -157,11 +136,7 @@ func TestServerDirNotFound(t *testing.T) {
 }
 
 func TestServerServeIndexPage(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "index"
 
@@ -189,11 +164,7 @@ func TestServerServeIndexPage(t *testing.T) {
 }
 
 func TestServerRedirectIndexPage(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "index"
 
@@ -226,11 +197,7 @@ func TestServerRedirectIndexPage(t *testing.T) {
 }
 
 func TestServerRedirectTrailingSlashDir(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "index"
 
@@ -264,15 +231,11 @@ func TestServerRedirectTrailingSlashDir(t *testing.T) {
 }
 
 func TestServerRedirectTrailingSlashDirFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
-	f, err := ioutil.TempFile(dir, "")
+	f, err := os.CreateTemp(dir, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -303,11 +266,7 @@ func TestServerRedirectTrailingSlashDirFile(t *testing.T) {
 }
 
 func TestServerHasher(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -338,11 +297,7 @@ func TestServerHasher(t *testing.T) {
 }
 
 func TestServerHasherRedirect(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -376,11 +331,7 @@ func TestServerHasherRedirect(t *testing.T) {
 }
 
 func TestServerHasherWithExtension(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -408,11 +359,7 @@ func TestServerHasherWithExtension(t *testing.T) {
 }
 
 func TestServerHasherRedirectWithExtension(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -446,11 +393,7 @@ func TestServerHasherRedirectWithExtension(t *testing.T) {
 }
 
 func TestServerHasherNoRegularFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -478,11 +421,7 @@ func TestServerHasherNoRegularFile(t *testing.T) {
 }
 
 func TestServerHasherRedirectTrailingSlash(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -516,11 +455,7 @@ func TestServerHasherRedirectTrailingSlash(t *testing.T) {
 }
 
 func TestServerHasherRedirectTrailingSlashCanonicalPath(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -564,11 +499,7 @@ func (f faultyHasher) IsHash(string) bool {
 }
 
 func TestServerInternalServerError(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
 	if err != nil {
@@ -597,11 +528,7 @@ func TestServerInternalServerError(t *testing.T) {
 }
 
 func TestServerInternalServerErrorCustom(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
 	if err != nil {
@@ -648,11 +575,7 @@ func (f nullHasher) IsHash(string) bool {
 }
 
 func TestServerHasherNullHasher(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -681,11 +604,7 @@ func TestServerHasherNullHasher(t *testing.T) {
 }
 
 func TestServerHashedPath(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -715,11 +634,7 @@ func TestServerHashedPath(t *testing.T) {
 }
 
 func TestServerNoHasher(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "file content"
 
@@ -747,11 +662,7 @@ func TestServerNoHasher(t *testing.T) {
 }
 
 func TestServerHashedPathError(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	f, err := os.Create(filepath.Join(dir, "data.txt"))
 	if err != nil {
@@ -777,11 +688,7 @@ func TestServerHashedPathError(t *testing.T) {
 }
 
 func TestServerGetHashedPath(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
@@ -815,11 +722,7 @@ func TestServerGetHashedPath(t *testing.T) {
 }
 
 func TestServerHashedPathFromFilename(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
@@ -847,22 +750,13 @@ func TestServerHashedPathFromFilename(t *testing.T) {
 }
 
 func TestServerHashedPathFromFilenameWithAltDir(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	altDir, err := ioutil.TempDir("", "file-server-test-alt")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	altDir := t.TempDir()
 
 	content := "file alt content"
 
-	err = ioutil.WriteFile(filepath.Join(altDir, "data.12345678.txt"), []byte(content), 0666)
-	if err != nil {
+	if err := os.WriteFile(filepath.Join(altDir, "data.12345678.txt"), []byte(content), 0666); err != nil {
 		t.Error(err)
 	}
 
@@ -882,11 +776,7 @@ func TestServerHashedPathFromFilenameWithAltDir(t *testing.T) {
 }
 
 func TestServerHashedPathFromFilenameWithFilenames(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	content := "gopher"
 	f, err := os.Create(filepath.Join(dir, "data.12345678.txt"))
@@ -915,22 +805,13 @@ func TestServerHashedPathFromFilenameWithFilenames(t *testing.T) {
 }
 
 func TestServerHashedPathFromFilenameWithAltDirWithFilenames(t *testing.T) {
-	dir, err := ioutil.TempDir("", "file-server-test")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	altDir, err := ioutil.TempDir("", "file-server-test-alt")
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.RemoveAll(dir)
+	altDir := t.TempDir()
 
 	content := "file alt content"
 
-	err = ioutil.WriteFile(filepath.Join(altDir, "data.12345678.txt"), []byte(content), 0666)
-	if err != nil {
+	if err := os.WriteFile(filepath.Join(altDir, "data.12345678.txt"), []byte(content), 0666); err != nil {
 		t.Error(err)
 	}
 
