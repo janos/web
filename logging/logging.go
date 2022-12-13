@@ -8,10 +8,12 @@ package logging
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
+	"golang.org/x/exp/slog"
 	"resenje.org/iostuff"
 )
 
@@ -41,4 +43,22 @@ func NewDailyReplaceableWriterConstructor(dir, name string) func(flag string) (f
 		}
 		return f, today, nil
 	}
+}
+
+// NewContextLoggerHandler injects logger into HTTP request Context.
+// HandlerLogger function can be used to get the logger and attach a handler
+// name.
+func NewContextLoggerHandler(h http.Handler, l *slog.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r = r.WithContext(slog.NewContext(r.Context(), l))
+		h.ServeHTTP(w, r)
+	})
+}
+
+const HandlerKey = "handler"
+
+// HandlerLogger provides a logger from HTTP request with attached name of the
+// handler.
+func HandlerLogger(r *http.Request, handlerName string) *slog.Logger {
+	return slog.FromContext(r.Context()).With(HandlerKey, handlerName)
 }
