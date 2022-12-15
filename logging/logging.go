@@ -17,6 +17,28 @@ import (
 	"resenje.org/iostuff"
 )
 
+// NewApplicationLoggerCloser construct a logger and returns a closer of its
+// writer. It uses ApplicationLogWriteCloser with
+// iostuff.NewDailyReplaceableWriterConstructor for log rotation.
+func NewApplicationLoggerCloser(dir, name string, newHandler func(io.Writer) slog.Handler, fallback io.Writer) (l *slog.Logger, closeFunc func() error) {
+	w := ApplicationLogWriteCloser(dir, name, fallback)
+	return slog.New(newHandler(w)), w.Close
+}
+
+// NewTextHandler calls slog.NewTextHandler but returns the Logger interface to
+// be used as an argument in NewApplicationLoggerCloser.
+func NewTextHandler(w io.Writer) slog.Handler {
+	return slog.NewTextHandler(w)
+}
+
+// NewJSONHandler calls slog.NewJSONHandler but returns the Logger interface to
+// be used as an argument in NewApplicationLoggerCloser.
+func NewJSONHandler(w io.Writer) slog.Handler {
+	return slog.NewJSONHandler(w)
+}
+
+// ApplicationLogWriteCloser returns a writer which is a daily rotated file
+// constructed using NewDailyReplaceableWriterConstructor.
 func ApplicationLogWriteCloser(dir, name string, fallback io.Writer) io.WriteCloser {
 	if dir == "" {
 		if wc, ok := fallback.(io.WriteCloser); ok {
@@ -27,6 +49,11 @@ func ApplicationLogWriteCloser(dir, name string, fallback io.Writer) io.WriteClo
 	return iostuff.NewReplaceableWriter(NewDailyReplaceableWriterConstructor(dir, name))
 }
 
+// NewDailyReplaceableWriterConstructor creates a writer constructor that can be
+// used for daily rotated files for iostuff.NewReplaceableWriter. The files are
+// named using pattern dir/2006/01/02/name.log where dir and name are passed
+// arguments and the date parameters are year, month and day values of the
+// current time.
 func NewDailyReplaceableWriterConstructor(dir, name string) func(flag string) (f io.Writer, today string, err error) {
 	return func(flag string) (io.Writer, string, error) {
 		today := time.Now().Format("2006/01/02")
@@ -55,6 +82,7 @@ func NewContextLoggerHandler(h http.Handler, l *slog.Logger) http.Handler {
 	})
 }
 
+// HandlerKey is a log key for the handler name added by HandlerLogger function.
 const HandlerKey = "handler"
 
 // HandlerLogger provides a logger from HTTP request with attached name of the
