@@ -87,13 +87,13 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if h.label != "" {
 				debugMsg = h.label + "\n\n" + debugMsg
 			}
-			h.logger.Log(slog.ErrorLevel, "http recovery handler", "method", r.Method, "url", r.URL.String(), slog.ErrorKey, err, "debug", debugMsg)
+			h.logger.Log(slog.LevelError, "http recovery handler", "method", r.Method, "url", r.URL.String(), slog.ErrorKey, err, "debug", debugMsg)
 
 			if h.notifier != nil {
 				go func() {
 					defer func() {
 						if err := recover(); err != nil {
-							h.logger.Log(slog.ErrorLevel, "http recovery handler: notify panic", slog.Any(slog.ErrorKey, err))
+							h.logger.Log(slog.LevelError, "http recovery handler: notify panic", slog.Any(slog.ErrorKey, err))
 						}
 					}()
 
@@ -107,7 +107,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						),
 						debugMsg,
 					); err != nil {
-						h.logger.Log(slog.ErrorLevel, "http recovery handler: notify", slog.Any(slog.ErrorKey, err))
+						h.logger.Log(slog.LevelError, "http recovery handler: notify", slog.Any(slog.ErrorKey, err))
 					}
 				}()
 			}

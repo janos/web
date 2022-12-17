@@ -83,15 +83,15 @@ func NewAccessLogHandler(h http.Handler, logger *slog.Logger, o *AccessLogOption
 		var level slog.Level
 		switch {
 		case status >= 500:
-			level = slog.ErrorLevel
+			level = slog.LevelError
 		case status >= 400:
-			level = slog.WarnLevel
+			level = slog.LevelWarn
 		case status >= 300:
-			level = slog.InfoLevel
+			level = slog.LevelInfo
 		case status >= 200:
-			level = slog.InfoLevel
+			level = slog.LevelInfo
 		default:
-			level = slog.DebugLevel
+			level = slog.LevelDebug
 		}
 
 		logger.LogAttrs(level, logMessage, attrs...)
