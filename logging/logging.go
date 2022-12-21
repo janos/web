@@ -20,26 +20,20 @@ import (
 // NewApplicationLoggerCloser construct a logger and returns a closer of its
 // writer. It uses ApplicationLogWriteCloser with
 // iostuff.NewDailyReplaceableWriterConstructor for log rotation.
-func NewApplicationLoggerCloser(dir, name string, newHandler func(io.Writer, *slog.HandlerOptions) slog.Handler, fallback io.Writer, o *slog.HandlerOptions) (l *slog.Logger, closeFunc func() error) {
+func NewApplicationLoggerCloser(dir, name string, newHandler func(io.Writer) slog.Handler, fallback io.Writer) (l *slog.Logger, closeFunc func() error) {
 	w := ApplicationLogWriteCloser(dir, name, fallback)
-	return slog.New(newHandler(w, o)), w.Close
+	return slog.New(newHandler(w)), w.Close
 }
 
 // NewTextHandler calls slog.NewTextHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewTextHandler(w io.Writer, o *slog.HandlerOptions) slog.Handler {
-	if o != nil {
-		o.NewTextHandler(w)
-	}
+func NewTextHandler(w io.Writer) slog.Handler {
 	return slog.NewTextHandler(w)
 }
 
 // NewJSONHandler calls slog.NewJSONHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewJSONHandler(w io.Writer, o *slog.HandlerOptions) slog.Handler {
-	if o != nil {
-		o.NewJSONHandler(w)
-	}
+func NewJSONHandler(w io.Writer) slog.Handler {
 	return slog.NewJSONHandler(w)
 }
 
