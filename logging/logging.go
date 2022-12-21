@@ -27,13 +27,19 @@ func NewApplicationLoggerCloser(dir, name string, newHandler func(io.Writer) slo
 
 // NewTextHandler calls slog.NewTextHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewTextHandler(w io.Writer) slog.Handler {
+func NewTextHandler(w io.Writer, o *slog.HandlerOptions) slog.Handler {
+	if o != nil {
+		o.NewTextHandler(w)
+	}
 	return slog.NewTextHandler(w)
 }
 
 // NewJSONHandler calls slog.NewJSONHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewJSONHandler(w io.Writer) slog.Handler {
+func NewJSONHandler(w io.Writer, o *slog.HandlerOptions) slog.Handler {
+	if o != nil {
+		o.NewJSONHandler(w)
+	}
 	return slog.NewJSONHandler(w)
 }
 
