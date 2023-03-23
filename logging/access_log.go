@@ -94,7 +94,7 @@ func NewAccessLogHandler(h http.Handler, logger *slog.Logger, o *AccessLogOption
 			level = slog.LevelDebug
 		}
 
-		logger.LogAttrs(level, logMessage, attrs...)
+		logger.LogAttrs(r.Context(), level, logMessage, attrs...)
 
 		if o.PostHook != nil {
 			o.PostHook(m.Code, m.Duration, m.Written)

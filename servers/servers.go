@@ -127,7 +127,7 @@ func (s *Servers) Serve() (err error) {
 						continue
 					}
 					if err := l.Close(); err != nil {
-						s.logger.Error("close tcp listener", err, "name", srv.label(), "address", srv.address)
+						s.logger.Error("close tcp listener", "name", srv.label(), "address", srv.address, "error", err)
 					}
 				}
 				return fmt.Errorf("%s tcp listener %q: %v", srv.label(), srv.address, err)
@@ -157,7 +157,7 @@ func (s *Servers) Serve() (err error) {
 
 				s.logger.Info("listen tcp", "label", srv.label(), "address", srv.tcpAddr.String())
 				if err := tcpSrv.ServeTCP(ln); err != nil {
-					s.logger.Error("serve tcp", err, "name", srv.label(), "address", srv.tcpAddr.String())
+					s.logger.Error("serve tcp", "name", srv.label(), "address", srv.tcpAddr.String(), "error", err)
 				}
 			}(srv, lns[i])
 		}
@@ -171,7 +171,7 @@ func (s *Servers) Serve() (err error) {
 
 				s.logger.Info("listen udp", "name", srv.label(), "address", srv.udpAddr.String())
 				if err := udpSrv.ServeUDP(conn); err != nil {
-					s.logger.Error("serve udp", err, "name", srv.label(), "address", srv.udpAddr.String(), err)
+					s.logger.Error("serve udp", "name", srv.label(), "address", srv.udpAddr.String(), "error", err)
 				}
 			}(srv, conns[i])
 		}
@@ -222,7 +222,7 @@ func (s *Servers) Close() {
 
 			s.logger.Info("closing server", "name", srv.label())
 			if err := srv.Close(); err != nil {
-				s.logger.Error("closing server", err, "name", srv.label())
+				s.logger.Error("closing server", "name", srv.label(), "error", err)
 			}
 		}(srv)
 	}
@@ -240,7 +240,7 @@ func (s *Servers) Shutdown(ctx context.Context) {
 
 			s.logger.Info("shutting down server", "name", srv.label())
 			if err := srv.Shutdown(ctx); err != nil {
-				s.logger.Error("shutting down server", err, "name", srv.label())
+				s.logger.ErrorCtx(ctx, "shutting down server", "name", srv.label(), "error", err)
 			}
 		}(srv)
 	}

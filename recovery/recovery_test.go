@@ -84,7 +84,7 @@ func TestHandlerLogger(t *testing.T) {
 
 	New(panicHandler, WithLogger(slog.New(slog.NewTextHandler(&buf)))).ServeHTTP(httptest.NewRecorder(), req)
 
-	want := "level=ERROR msg=\"http recovery handler\" method=GET url=/ err=\"HTTP utils panic!\" debug="
+	want := "level=ERROR msg=\"http recovery handler\" method=GET url=/ error=\"HTTP utils panic!\" debug="
 	if !strings.Contains(buf.String(), want) {
 		t.Errorf("got %q, expected %q", buf.String(), want)
 	}

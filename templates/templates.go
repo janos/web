@@ -237,7 +237,7 @@ func (t Templates) RespondTemplateWithStatus(w http.ResponseWriter, name, templa
 		w.WriteHeader(status)
 	}
 	if _, err := buf.WriteTo(w); err != nil {
-		t.logger.Debug("templates: respond template with status", "name", name, "template", templateName, "status", status, slog.ErrorKey, err)
+		t.logger.Debug("templates: respond template with status", "name", name, "template", templateName, "status", status, "error", err)
 	}
 }
 
@@ -257,7 +257,7 @@ func (t Templates) RespondWithStatus(w http.ResponseWriter, name string, data an
 		w.WriteHeader(status)
 	}
 	if _, err := buf.WriteTo(w); err != nil {
-		t.logger.Debug("templates: respond with status", "name", name, "status", status, slog.ErrorKey, err)
+		t.logger.Debug("templates: respond with status", "name", name, "status", status, "error", err)
 	}
 }
 

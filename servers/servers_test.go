@@ -234,7 +234,7 @@ func TestServersShutdown(t *testing.T) {
 
 	s.Shutdown(context.Background())
 
-	l = "ERROR shutting down server name=server err=\"server already shut down\""
+	l = "ERROR shutting down server name=server error=\"server already shut down\""
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}
@@ -272,7 +272,7 @@ func TestServersClose(t *testing.T) {
 
 	s.Close()
 
-	l = "ERROR closing server name=server err=\"server already closed\""
+	l = "ERROR closing server name=server error=\"server already closed\""
 	if !strings.Contains(buf.String(), l) {
 		t.Errorf("got %q, expected %q", buf.String(), l)
 	}

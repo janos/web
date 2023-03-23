@@ -6,6 +6,7 @@
 package logging
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -77,7 +78,7 @@ func NewDailyReplaceableWriterConstructor(dir, name string) func(flag string) (f
 // name.
 func NewContextLoggerHandler(h http.Handler, l *slog.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(slog.NewContext(r.Context(), l))
+		r = r.WithContext(newSlogContext(r.Context(), l))
 		h.ServeHTTP(w, r)
 	})
 }
@@ -88,5 +89,22 @@ const HandlerKey = "handler"
 // HandlerLogger provides a logger from HTTP request with attached name of the
 // handler.
 func HandlerLogger(r *http.Request, handlerName string) *slog.Logger {
-	return slog.FromContext(r.Context()).With(HandlerKey, handlerName)
+	return fromSlogContext(r.Context()).With(HandlerKey, handlerName)
+}
+
+type contextKeySlog struct{}
+
+// newSlogContext returns a context that contains the given Logger.
+// Use FromContext to retrieve the Logger.
+func newSlogContext(ctx context.Context, l *slog.Logger) context.Context {
+	return context.WithValue(ctx, contextKeySlog{}, l)
+}
+
+// fromSlogContext returns the Logger stored in ctx by NewContext, or the default
+// Logger if there is none.
+func fromSlogContext(ctx context.Context) *slog.Logger {
+	if l, ok := ctx.Value(contextKeySlog{}).(*slog.Logger); ok {
+		return l
+	}
+	return slog.Default()
 }

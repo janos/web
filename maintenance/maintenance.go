@@ -196,7 +196,7 @@ func (s Service) HTMLHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Error("maintenance status", err)
+			s.logger.Error("maintenance status", "error", err)
 		}
 		if on || err != nil {
 			if s.HTML.Handler != nil {
@@ -218,7 +218,7 @@ func (s Service) JSONHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Error("maintenance status", err)
+			s.logger.Error("maintenance status", "error", err)
 		}
 		if on || err != nil {
 			if s.JSON.Handler != nil {
@@ -240,7 +240,7 @@ func (s Service) TextHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		on, err := s.store.Status()
 		if err != nil {
-			s.logger.Error("maintenance status", err)
+			s.logger.Error("maintenance status", "error", err)
 		}
 		if on || err != nil {
 			if s.Text.Handler != nil {
@@ -266,7 +266,7 @@ func (s Service) Status() (on bool, err error) {
 func (s Service) StatusHandler(w http.ResponseWriter, r *http.Request) {
 	on, err := s.store.Status()
 	if err != nil {
-		s.logger.Error("maintenance status", err)
+		s.logger.Error("maintenance status", "error", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
@@ -279,7 +279,7 @@ func (s Service) StatusHandler(w http.ResponseWriter, r *http.Request) {
 func (s Service) OnHandler(w http.ResponseWriter, r *http.Request) {
 	changed, err := s.store.On()
 	if err != nil {
-		s.logger.Error("maintenance on", err)
+		s.logger.Error("maintenance on", "error", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
@@ -295,7 +295,7 @@ func (s Service) OnHandler(w http.ResponseWriter, r *http.Request) {
 func (s Service) OffHandler(w http.ResponseWriter, r *http.Request) {
 	changed, err := s.store.Off()
 	if err != nil {
-		s.logger.Error("maintenance off", err)
+		s.logger.Error("maintenance off", "error", err)
 		jsonInternalServerErrorResponse(w)
 		return
 	}
