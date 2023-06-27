@@ -7,12 +7,12 @@ package logging_test
 
 import (
 	"bytes"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"golang.org/x/exp/slog"
 	"resenje.org/web/logging"
 )
 
@@ -93,7 +93,7 @@ func TestAccessLog(t *testing.T) {
 			logging.NewAccessLogHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tc.statusCode)
 				_, _ = w.Write([]byte("test data"))
-			}), slog.New(slog.NewTextHandler(&buf)), nil).ServeHTTP(w, tc.request)
+			}), slog.New(slog.NewTextHandler(&buf, nil)), nil).ServeHTTP(w, tc.request)
 
 			got := buf.String()
 			if !strings.Contains(got, tc.pattern) {

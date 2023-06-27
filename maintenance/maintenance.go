@@ -7,12 +7,11 @@ package maintenance
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
-
-	"golang.org/x/exp/slog"
 )
 
 // Values for HTTP Content-Type header.

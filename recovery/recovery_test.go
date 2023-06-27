@@ -9,12 +9,11 @@ import (
 	"bytes"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"golang.org/x/exp/slog"
 )
 
 var (
@@ -82,7 +81,7 @@ func TestHandlerPanicResponseHandler(t *testing.T) {
 func TestHandlerLogger(t *testing.T) {
 	var buf bytes.Buffer
 
-	New(panicHandler, WithLogger(slog.New(slog.NewTextHandler(&buf)))).ServeHTTP(httptest.NewRecorder(), req)
+	New(panicHandler, WithLogger(slog.New(slog.NewTextHandler(&buf, nil)))).ServeHTTP(httptest.NewRecorder(), req)
 
 	want := "level=ERROR msg=\"http recovery handler\" method=GET url=/ error=\"HTTP utils panic!\" debug="
 	if !strings.Contains(buf.String(), want) {

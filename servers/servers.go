@@ -8,10 +8,9 @@ package servers
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"sync"
-
-	"golang.org/x/exp/slog"
 )
 
 // Option is a function that sets optional parameters for Servers.

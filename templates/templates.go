@@ -9,11 +9,10 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
-
-	"golang.org/x/exp/slog"
 )
 
 // Error is a common error type that holds

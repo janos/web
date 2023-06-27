@@ -12,14 +12,13 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net"
 	"strconv"
 	"strings"
 	"sync"
 	"testing"
 	"time"
-
-	"golang.org/x/exp/slog"
 )
 
 var (
@@ -123,7 +122,7 @@ func TestEmptyServer(t *testing.T) {
 func TestWithLogger(t *testing.T) {
 	var buf bytes.Buffer
 
-	s := New(WithLogger(slog.New(slog.NewJSONHandler(&buf))))
+	s := New(WithLogger(slog.New(slog.NewJSONHandler(&buf, nil))))
 
 	m := newMockServer()
 

@@ -6,13 +6,13 @@
 package logging
 
 import (
+	"log/slog"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/felixge/httpsnoop"
-	"golang.org/x/exp/slog"
 )
 
 type AccessLogOptions struct {

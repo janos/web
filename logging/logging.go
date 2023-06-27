@@ -9,12 +9,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
-	"golang.org/x/exp/slog"
 	"resenje.org/iostuff"
 )
 
@@ -28,14 +28,14 @@ func NewApplicationLoggerCloser(dir, name string, newHandler func(io.Writer) slo
 
 // NewTextHandler calls slog.NewTextHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewTextHandler(w io.Writer) slog.Handler {
-	return slog.NewTextHandler(w)
+func NewTextHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
+	return slog.NewTextHandler(w, opts)
 }
 
 // NewJSONHandler calls slog.NewJSONHandler but returns the Logger interface to
 // be used as an argument in NewApplicationLoggerCloser.
-func NewJSONHandler(w io.Writer) slog.Handler {
-	return slog.NewJSONHandler(w)
+func NewJSONHandler(w io.Writer, opts *slog.HandlerOptions) slog.Handler {
+	return slog.NewJSONHandler(w, opts)
 }
 
 // ApplicationLogWriteCloser returns a writer which is a daily rotated file

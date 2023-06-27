@@ -7,10 +7,9 @@ package recovery
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"runtime/debug"
-
-	"golang.org/x/exp/slog"
 )
 
 // Handler implements http.Handler interface that will recover from panic

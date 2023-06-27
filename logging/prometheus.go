@@ -6,8 +6,9 @@
 package logging
 
 import (
+	"log/slog"
+
 	"github.com/prometheus/client_golang/prometheus"
-	"golang.org/x/exp/slog"
 )
 
 // Metrics holds Prometheus counters.
