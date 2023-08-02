@@ -87,13 +87,13 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if h.label != "" {
 				debugMsg = h.label + "\n\n" + debugMsg
 			}
-			h.logger.ErrorCtx(ctx, "http recovery handler", "method", r.Method, "url", r.URL.String(), "error", err, "debug", debugMsg)
+			h.logger.ErrorContext(ctx, "http recovery handler", "method", r.Method, "url", r.URL.String(), "error", err, "debug", debugMsg)
 
 			if h.notifier != nil {
 				go func() {
 					defer func() {
 						if err := recover(); err != nil {
-							h.logger.ErrorCtx(ctx, "http recovery handler: notify panic", slog.Any("error", err))
+							h.logger.ErrorContext(ctx, "http recovery handler: notify panic", slog.Any("error", err))
 						}
 					}()
 
@@ -107,7 +107,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						),
 						debugMsg,
 					); err != nil {
-						h.logger.ErrorCtx(ctx, "http recovery handler: notify", slog.Any("error", err))
+						h.logger.ErrorContext(ctx, "http recovery handler: notify", slog.Any("error", err))
 					}
 				}()
 			}

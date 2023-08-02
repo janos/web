@@ -239,7 +239,7 @@ func (s *Servers) Shutdown(ctx context.Context) {
 
 			s.logger.Info("shutting down server", "name", srv.label())
 			if err := srv.Shutdown(ctx); err != nil {
-				s.logger.ErrorCtx(ctx, "shutting down server", "name", srv.label(), "error", err)
+				s.logger.ErrorContext(ctx, "shutting down server", "name", srv.label(), "error", err)
 			}
 		}(srv)
 	}
