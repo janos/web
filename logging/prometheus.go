@@ -45,15 +45,18 @@ func NewMetrics(options *MetricsOptions) (c *Metrics) {
 			Name:      options.Name,
 			Help:      options.Help,
 		},
-		[]string{"level"},
+		[]string{"logger", "level"},
 	)
 	return &Metrics{
 		vector: vector,
 	}
 }
 
-func (c *Metrics) Inc(level slog.Level) {
-	c.vector.WithLabelValues(level.String()).Inc()
+func (c *Metrics) Inc(loggerName string, level slog.Level) {
+	c.vector.With(prometheus.Labels{
+		"logger": loggerName,
+		"level":  level.String(),
+	}).Inc()
 }
 
 // Metrics returns all Prometheus metrics that should be registered.
