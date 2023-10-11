@@ -7,8 +7,8 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/quic-go/quic-go v0.36.1-0.20230624224813-66dbe5d5808f
-	golang.org/x/crypto v0.7.0
-	golang.org/x/net v0.10.0
+	golang.org/x/crypto v0.14.0
+	golang.org/x/net v0.17.0
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 	resenje.org/email v0.1.3
@@ -34,8 +34,8 @@ require (
 	github.com/quic-go/qtls-go1-20 v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
 	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.9.1 // indirect
 	google.golang.org/genproto v0.0.0-20230322174352-cde4c949918d // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
