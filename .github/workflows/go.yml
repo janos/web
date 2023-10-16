@@ -14,7 +14,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21.0-rc.3'
+        go-version: '1.21'
 
     - name: Checkout
       uses: actions/checkout@v1
@@ -31,12 +31,11 @@ jobs:
           ${{ runner.OS }}-build-
           ${{ runner.OS }}-
 
-    # TODO: enable with Go 1.21 final release
-    # - name: Lint
-    #   uses: golangci/golangci-lint-action@v2
-    #   with:
-    #     version: v1.53.3
-    #     args: --timeout 10m
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.54.2
+        args: --timeout 10m
 
     - name: Vet
       if: matrix.os == 'ubuntu-latest'
