@@ -6,7 +6,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.3
 	github.com/gorilla/handlers v1.5.1
 	github.com/prometheus/client_golang v1.17.0
-	github.com/quic-go/quic-go v0.39.0
+	github.com/quic-go/quic-go v0.38.1
 	golang.org/x/crypto v0.14.0
 	golang.org/x/net v0.17.0
 	google.golang.org/grpc v1.58.3
@@ -22,6 +22,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
@@ -31,7 +32,6 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-20 v0.3.4 // indirect
-	go.uber.org/mock v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
