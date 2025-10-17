@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 )
 
@@ -20,11 +21,12 @@ const basicAuthScheme string = "Basic "
 // custom Key and Secret HTTP headers, or Basic auth from Authorization header.
 // Depending on configuration of BasicAuthRealm, KeyHeaderName or SecretHeaderName,
 // it can be used as"
-//  - Basic auth handler - only BasicAuthRealm is set
-//  - single API key auth handler - only KeyHeaderName is set
-//  - single API key auth handler with Basic auth support - BasicAuthRealm and KeyHeaderName are set
-//  - public/secret API key auth handler - KeyHeaderName and SecretHeaderName are set
-//  - public/secret API key auth handler with Basic auth support - all three are set
+//   - Basic auth handler - only BasicAuthRealm is set
+//   - single API key auth handler - only KeyHeaderName is set
+//   - single API key auth handler with Basic auth support - BasicAuthRealm and KeyHeaderName are set
+//   - public/secret API key auth handler - KeyHeaderName and SecretHeaderName are set
+//   - public/secret API key auth handler with Basic auth support - all three are set
+//
 // By setting AuthorizedNetworks, this handler can authorize requests based only on
 // RemoteAddr address.
 type AuthHandler[Entity any] struct {
@@ -101,7 +103,7 @@ func getRequestIPs(r *http.Request) (ips []net.IP) {
 		}
 	}
 	if h := r.Header.Get("X-Forwarded-For"); h != "" {
-		for _, x := range strings.Split(h, ",") {
+		for x := range strings.SplitSeq(h, ",") {
 			if i := net.ParseIP(strings.TrimSpace(x)); i != nil {
 				ips = append(ips, i)
 			}
@@ -134,11 +136,9 @@ func (h AuthHandler[Entity]) authenticate(r *http.Request) (valid bool, entity E
 			ips = []net.IP{ip}
 		}
 		for _, network := range h.AuthorizedNetworks {
-			for _, ip := range ips {
-				if network.Contains(ip) {
-					valid = true
-					return
-				}
+			if slices.ContainsFunc(ips, network.Contains) {
+				valid = true
+				return
 			}
 		}
 	}

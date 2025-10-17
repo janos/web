@@ -9,6 +9,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"io"
+	"slices"
 	"strings"
 )
 
@@ -45,13 +46,7 @@ func (s MD5Hasher) IsHash(h string) bool {
 	}
 	var found bool
 	for _, c := range h {
-		found = false
-		for _, m := range hexChars {
-			if c == m {
-				found = true
-				break
-			}
-		}
+		found = slices.Contains(hexChars, c)
 		if !found {
 			return false
 		}

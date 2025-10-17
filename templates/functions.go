@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"slices"
 	"strings"
 	"time"
 )
@@ -76,10 +77,8 @@ func yearRangeFunc(year int) string {
 }
 
 func containsStringFunc(list []string, element, yes, no string) string {
-	for _, e := range list {
-		if e == element {
-			return yes
-		}
+	if slices.Contains(list, element) {
+		return yes
 	}
 	return no
 }

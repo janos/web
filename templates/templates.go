@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"html/template"
 	"log/slog"
+	"maps"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -101,9 +102,7 @@ func WithTemplateFromFiles(name string, files ...string) Option {
 // WithTemplatesFromFiles adds a map of templates parsed from files.
 func WithTemplatesFromFiles(ts map[string][]string) Option {
 	return func(o *Options) {
-		for name, files := range ts {
-			o.files[name] = files
-		}
+		maps.Copy(o.files, ts)
 	}
 }
 
@@ -115,9 +114,7 @@ func WithTemplateFromStrings(name string, strings ...string) Option {
 // WithTemplatesFromStrings adds a map of templates parsed from strings.
 func WithTemplatesFromStrings(ts map[string][]string) Option {
 	return func(o *Options) {
-		for name, strings := range ts {
-			o.strings[name] = strings
-		}
+		maps.Copy(o.strings, ts)
 	}
 }
 
@@ -129,9 +126,7 @@ func WithFunction(name string, fn any) Option {
 // WithFunctions adds function map to templates.
 func WithFunctions(fns template.FuncMap) Option {
 	return func(o *Options) {
-		for name, fn := range fns {
-			o.functions[name] = fn
-		}
+		maps.Copy(o.functions, fns)
 	}
 }
 
@@ -161,9 +156,7 @@ type Templates struct {
 // provided files and strings.
 func New(opts ...Option) (t *Templates, err error) {
 	functions := template.FuncMap{}
-	for name, fn := range defaultFunctions {
-		functions[name] = fn
-	}
+	maps.Copy(functions, defaultFunctions)
 	o := &Options{
 		fileFindFunc: func(f string) string {
 			return f

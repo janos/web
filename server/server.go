@@ -207,8 +207,8 @@ func (s *Server) WithHTTP(o HTTPOptions) (err error) {
 
 	for domain := range handlers {
 		var redirectDomain string
-		if strings.HasPrefix(domain, "www.") {
-			redirectDomain = strings.TrimPrefix(domain, "www.")
+		if after, ok := strings.CutPrefix(domain, "www."); ok {
+			redirectDomain = after
 		} else {
 			redirectDomain = "www." + domain
 		}
