@@ -28,7 +28,7 @@ func TestServer(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, fn := filepath.Split(f.Name())
-	_ = f.Close()
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/"+fn, nil)
 	w := httptest.NewRecorder()
@@ -55,9 +55,13 @@ func TestServerAltDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, fn := filepath.Split(f.Name())
-	_ = f.Close()
+	f.Close() //nolint:errcheck
 
-	altDir := t.TempDir()
+	altDir, err := os.MkdirTemp("", "file-server-test-alt")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll(dir) //nolint:errcheck
 
 	content = "file alt content"
 
@@ -144,9 +148,7 @@ func TestServerServeIndexPage(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets", nil)
 	w := httptest.NewRecorder()
@@ -174,9 +176,7 @@ func TestServerRedirectIndexPage(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/index.html", nil)
 	w := httptest.NewRecorder()
@@ -209,9 +209,7 @@ func TestServerRedirectTrailingSlashDir(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets", nil)
 	w := httptest.NewRecorder()
@@ -246,10 +244,7 @@ func TestServerRedirectTrailingSlashDirFile(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/"+fn+"/", nil)
 	w := httptest.NewRecorder()
@@ -284,10 +279,7 @@ func TestServerHasher(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	h := New("/assets", dir, &Options{
 		Hasher: MD5Hasher{8},
@@ -318,10 +310,7 @@ func TestServerHasherRedirect(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/"+fn, nil)
 	w := httptest.NewRecorder()
@@ -354,10 +343,7 @@ func TestServerHasherWithExtension(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/data.d10b4c3f.txt", nil)
 	w := httptest.NewRecorder()
@@ -386,10 +372,7 @@ func TestServerHasherRedirectWithExtension(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/"+fn, nil)
 	w := httptest.NewRecorder()
@@ -422,10 +405,7 @@ func TestServerHasherNoRegularFile(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets", nil)
 	w := httptest.NewRecorder()
@@ -453,10 +433,7 @@ func TestServerHasherRedirectTrailingSlash(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/data.d10b4c3f.txt/", nil)
 	w := httptest.NewRecorder()
@@ -490,10 +467,7 @@ func TestServerHasherRedirectTrailingSlashCanonicalPath(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/data.txt/", nil)
 	w := httptest.NewRecorder()
@@ -535,10 +509,7 @@ func TestServerInternalServerError(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	h := New("/assets", dir, &Options{
 		Hasher: faultyHasher{},
@@ -567,10 +538,7 @@ func TestServerInternalServerErrorCustom(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	content := "Test"
 	h := New("/assets", dir, &Options{
@@ -620,10 +588,7 @@ func TestServerHasherNullHasher(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	r := httptest.NewRequest("", "/assets/"+fn, nil)
 	w := httptest.NewRecorder()
@@ -652,10 +617,7 @@ func TestServerHashedPath(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	p, err := New("/assets", dir, &Options{
 		Hasher: MD5Hasher{8},
@@ -685,10 +647,7 @@ func TestServerNoHasher(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	p, err := New("/assets", dir, nil).HashedPath(fn)
 
@@ -713,10 +672,7 @@ func TestServerHashedPathError(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	p, err := New("/assets", dir, &Options{
 		Hasher: faultyHasher{},
@@ -743,10 +699,7 @@ func TestServerGetHashedPath(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	h := New("/assets", dir, &Options{
 		Hasher: MD5Hasher{8},
@@ -780,10 +733,7 @@ func TestServerHashedPathFromFilename(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	h := New("/assets", dir, &Options{
 		Hasher: MD5Hasher{8},
@@ -837,10 +787,7 @@ func TestServerHashedPathFromFilenameWithFilenames(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
-	}
+	f.Close() //nolint:errcheck
 
 	h := New("/assets", dir, &Options{
 		Hasher:    MD5Hasher{8},

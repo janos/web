@@ -91,7 +91,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.httpError(w, r, err)
 		return
 	}
-	defer func() { _ = f.Close() }()
+	defer f.Close() //nolint:errcheck
 
 	d, err := f.Stat()
 	if err != nil {
@@ -118,7 +118,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		index := strings.TrimSuffix(p, "/") + s.IndexPage
 		ff, err := s.open(index)
 		if err == nil {
-			defer func() { _ = ff.Close() }()
+			defer ff.Close() //nolint:errcheck
 			dd, err := ff.Stat()
 			if err == nil {
 				d = dd
@@ -189,7 +189,7 @@ func (s *Server) hash(p string) (h string, cont bool, err error) {
 		cont = true
 		return
 	}
-	defer func() { _ = f.Close() }()
+	defer f.Close() //nolint:errcheck
 
 	d, err := f.Stat()
 	if err != nil {
