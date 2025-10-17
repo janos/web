@@ -1,6 +1,6 @@
 module resenje.org/web
 
-go 1.21
+go 1.25
 
 require (
 	github.com/felixge/httpsnoop v1.0.4
