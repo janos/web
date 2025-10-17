@@ -72,7 +72,7 @@ func (s *Server) QuicHeadersHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// this error is safe to ignore as address is
 		// set from the udp connection
-		_ = s.SetQuicHeaders(w.Header())
+		_ = s.SetQUICHeaders(w.Header())
 		h.ServeHTTP(w, r)
 	})
 }
