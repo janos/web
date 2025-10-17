@@ -27,7 +27,7 @@ func (c *conn) Read(b []byte) (int, error) {
 		if len(b) > 1 && c.e == nil {
 			n, e := c.Conn.Read(b[1:])
 			if e != nil {
-				c.Conn.Close()
+				_ = c.Close()
 			}
 			return n + 1, e
 		}
@@ -64,7 +64,7 @@ func (l TLSListener) Accept() (net.Conn, error) {
 	b := make([]byte, 1)
 	_, err = c.Read(b)
 	if err != nil {
-		c.Close()
+		_ = c.Close()
 		if err != io.EOF {
 			return nil, err
 		}

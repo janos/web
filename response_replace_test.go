@@ -17,24 +17,24 @@ import (
 func TestResponseReplaceHanlder(t *testing.T) {
 	handler := web.ResponseReplaceHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
-			fmt.Fprint(w, "OK")
+			_, _ = fmt.Fprint(w, "OK")
 			return
 		}
 		if r.URL.Path == "/broken" {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "sensitive information")
+			_, _ = fmt.Fprint(w, "sensitive information")
 			return
 		}
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "this should never be seen")
+		_, _ = fmt.Fprint(w, "this should never be seen")
 	}), map[int]http.Handler{
 		http.StatusNotFound: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound) // keep the same status
-			fmt.Fprint(w, "the page is not here")
+			_, _ = fmt.Fprint(w, "the page is not here")
 		}),
 		http.StatusInternalServerError: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusTeapot) // set a different status
-			fmt.Fprint(w, "have some tea")
+			_, _ = fmt.Fprint(w, "have some tea")
 		}),
 	})
 

@@ -55,5 +55,5 @@ func (h MaxBodyBytesHandler) requestEntityTooLarge(w http.ResponseWriter, r *htt
 		h.ErrorHandler(w, r, err)
 		return
 	}
-	fmt.Fprintln(w, body)
+	_, _ = fmt.Fprintln(w, body)
 }

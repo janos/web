@@ -91,7 +91,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.httpError(w, r, err)
 		return
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	d, err := f.Stat()
 	if err != nil {
@@ -118,7 +118,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		index := strings.TrimSuffix(p, "/") + s.IndexPage
 		ff, err := s.open(index)
 		if err == nil {
-			defer ff.Close()
+			defer func() { _ = ff.Close() }()
 			dd, err := ff.Stat()
 			if err == nil {
 				d = dd
@@ -189,7 +189,7 @@ func (s *Server) hash(p string) (h string, cont bool, err error) {
 		cont = true
 		return
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	d, err := f.Stat()
 	if err != nil {
@@ -298,7 +298,7 @@ func (s Server) canonicalPath(p string) string {
 	f = ""
 	l := len(parts)
 	index := 1
-	if l > 2 && !(l == 3 && parts[0] == "") {
+	if l > 2 && (l != 3 || parts[0] != "") {
 		index = 2
 	}
 	for i, part := range parts {

@@ -64,7 +64,7 @@ func redirectHTTPSHandler(h http.Handler, httpsPort string) http.Handler {
 func textNotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprintln(w, http.StatusText(http.StatusNotFound))
+	_, _ = fmt.Fprintln(w, http.StatusText(http.StatusNotFound))
 }
 
 // statusResponse is a response of a status API handler.
@@ -84,7 +84,7 @@ func (s *Server) statusAPIHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) statusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	fmt.Fprintf(w, "%s version %s, uptime %s", s.name, s.Version(), time.Since(s.startTime))
+	_, _ = fmt.Fprintf(w, "%s version %s, uptime %s", s.name, s.Version(), time.Since(s.startTime))
 }
 
 // Recovery handler for JSON API routers.

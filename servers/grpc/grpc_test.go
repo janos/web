@@ -48,7 +48,7 @@ func TestServer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	c := hello.NewGreeterClient(conn)
 
 	name := "Gopher"
@@ -79,7 +79,7 @@ func TestServerShutdown(t *testing.T) {
 
 	go func() {
 		if err := s.ServeTCP(ln); err != nil {
-			if e, ok := err.(*net.OpError); !(ok && e.Op == "accept") {
+			if e, ok := err.(*net.OpError); !ok || e.Op != "accept" {
 				panic(err)
 			}
 		}
@@ -89,7 +89,7 @@ func TestServerShutdown(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	c := hello.NewGreeterClient(conn)
 
 	name := "Gopher"
@@ -129,7 +129,7 @@ func TestServerClose(t *testing.T) {
 
 	go func() {
 		if err := s.ServeTCP(ln); err != nil {
-			if e, ok := err.(*net.OpError); !(ok && e.Op == "accept") {
+			if e, ok := err.(*net.OpError); !ok || e.Op != "accept" {
 				panic(err)
 			}
 		}
@@ -139,7 +139,7 @@ func TestServerClose(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	c := hello.NewGreeterClient(conn)
 
 	name := "Gopher"
@@ -154,7 +154,7 @@ func TestServerClose(t *testing.T) {
 		t.Errorf("got %q, expected %q", r.Message, want)
 	}
 
-	s.Close()
+	_ = s.Close()
 
 	_, err = c.Greet(context.Background(), &hello.GreetRequest{Name: name})
 	if !strings.Contains(err.Error(), "Unavailable") {

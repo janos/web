@@ -57,13 +57,13 @@ func New(handler http.Handler, opts ...Option) (s *Server) {
 
 // ServeUDP serves requests over UDP connection.
 func (s *Server) ServeUDP(conn *net.UDPConn) (err error) {
-	s.Server.Addr = conn.LocalAddr().String()
-	return s.Server.Serve(conn)
+	s.Addr = conn.LocalAddr().String()
+	return s.Serve(conn)
 }
 
 // Shutdown calls http3.Server.Close method.
 func (s *Server) Shutdown(_ context.Context) (err error) {
-	return s.Server.Close()
+	return s.Close()
 }
 
 // QuicHeadersHandler should be used as a middleware to set

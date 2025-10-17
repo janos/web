@@ -30,7 +30,7 @@ func HandleMethods(methods map[string]http.Handler, body string, contentType str
 		} else {
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(http.StatusMethodNotAllowed)
-			fmt.Fprintln(w, body)
+			_, _ = fmt.Fprintln(w, body)
 		}
 	}
 }

@@ -316,7 +316,7 @@ func TestAddressConflict(t *testing.T) {
 		t.Fatal(err)
 	}
 	listen := ":" + strconv.Itoa(ln.Addr().(*net.TCPAddr).Port)
-	defer ln.Close()
+	defer func() { _ = ln.Close() }()
 
 	s := New()
 

@@ -18,7 +18,7 @@ import (
 var (
 	responseBody = "response body"
 	handler      = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, responseBody)
+		_, _ = fmt.Fprint(w, responseBody)
 	})
 )
 
@@ -40,7 +40,7 @@ func TestServer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -115,7 +115,7 @@ viBngkOY/zwTS9mYvM8ixsj16b2WWzajtjhBtihs+tur
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

@@ -122,7 +122,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			w.WriteHeader(http.StatusInternalServerError)
 			if h.panicBody != "" {
-				fmt.Fprintln(w, h.panicBody)
+				_, _ = fmt.Fprintln(w, h.panicBody)
 			}
 		}
 	}()

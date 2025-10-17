@@ -66,7 +66,7 @@ func (s *Server) ServeTCP(ln net.Listener) (err error) {
 		ln = tls.NewListener(ln, s.TLSConfig)
 	}
 
-	err = s.Server.Serve(ln)
+	err = s.Serve(ln)
 	if err == http.ErrServerClosed {
 		return nil
 	}

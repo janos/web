@@ -31,7 +31,10 @@ func TestNewStaticFilesHandler(t *testing.T) {
 		t.Error(err)
 	}
 	_, fn := filepath.Split(f.Name())
-	f.Close()
+
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
 
 	r := httptest.NewRequest("", "/static/"+fn, nil)
 	w := httptest.NewRecorder()

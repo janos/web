@@ -119,7 +119,7 @@ func (s *FileStore) On() (changed bool, err error) {
 	if err != nil {
 		return
 	}
-	f.Close()
+	_ = f.Close()
 	changed = true
 	return
 }
@@ -204,7 +204,7 @@ func (s Service) HTMLHandler(h http.Handler) http.Handler {
 			}
 			w.Header().Set("Content-Type", HTMLContentType)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			fmt.Fprintln(w, s.HTML.Body)
+			_, _ = fmt.Fprintln(w, s.HTML.Body)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -226,7 +226,7 @@ func (s Service) JSONHandler(h http.Handler) http.Handler {
 			}
 			w.Header().Set("Content-Type", JSONContentType)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			fmt.Fprintln(w, s.JSON.Body)
+			_, _ = fmt.Fprintln(w, s.JSON.Body)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -248,7 +248,7 @@ func (s Service) TextHandler(h http.Handler) http.Handler {
 			}
 			w.Header().Set("Content-Type", TextContentType)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			fmt.Fprintln(w, s.Text.Body)
+			_, _ = fmt.Fprintln(w, s.Text.Body)
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -307,27 +307,27 @@ func (s Service) OffHandler(w http.ResponseWriter, r *http.Request) {
 func jsonOKResponse(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", JSONContentType)
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, `{"message":"OK","code":200}`)
+	_, _ = fmt.Fprintln(w, `{"message":"OK","code":200}`)
 }
 
 func jsonCreatedResponse(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", JSONContentType)
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintln(w, `{"message":"Created","code":201}`)
+	_, _ = fmt.Fprintln(w, `{"message":"Created","code":201}`)
 }
 
 func jsonInternalServerErrorResponse(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", JSONContentType)
 	w.WriteHeader(http.StatusInternalServerError)
-	fmt.Fprintln(w, `{"message":"Internal Server Error","code":500}`)
+	_, _ = fmt.Fprintln(w, `{"message":"Internal Server Error","code":500}`)
 }
 
 func jsonStatusResponse(w http.ResponseWriter, on bool) {
 	w.Header().Set("Content-Type", JSONContentType)
 	w.WriteHeader(http.StatusOK)
 	if on {
-		fmt.Fprintln(w, `{"status":"on"}`)
+		_, _ = fmt.Fprintln(w, `{"status":"on"}`)
 	} else {
-		fmt.Fprintln(w, `{"status":"off"}`)
+		_, _ = fmt.Fprintln(w, `{"status":"off"}`)
 	}
 }
